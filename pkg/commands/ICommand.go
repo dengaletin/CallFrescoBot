@@ -1,5 +1,5 @@
 package commands
 
-type Command interface {
+type ICommand interface {
 	RunCommand() string
 }
