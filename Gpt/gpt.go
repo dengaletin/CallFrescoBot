@@ -1,6 +1,7 @@
 package gpt
 
 import (
+	"CallFrescoBot/pkg/messages"
 	"context"
 	"log"
 	"os"
@@ -11,7 +12,7 @@ import (
 func GetResponse(question string) string {
 	apiKey := os.Getenv("GPT_API_KEY")
 	if apiKey == "" {
-		log.Fatalln("Missing GPT_API_KEY")
+		log.Fatalln(messages.MissingGptKey)
 	}
 
 	ctx := context.Background()
@@ -30,7 +31,7 @@ func GetResponse(question string) string {
 	if err != nil {
 		log.Println(err)
 
-		return "Something wen't wrong :("
+		return messages.ErrorMsg
 	}
 	return response
 }

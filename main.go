@@ -1,7 +1,8 @@
 package main
 
 import (
-	gpt "CallFrescoBot/Gpt"
+	"CallFrescoBot/pkg/commands"
+	"CallFrescoBot/pkg/messages"
 	"log"
 	"os"
 
@@ -13,7 +14,7 @@ func main() {
 	godotenv.Load()
 	apiKey := os.Getenv("TELEGRAM_API_KEY")
 	if apiKey == "" {
-		log.Fatalln("Missing TELEGRAM_API_KEY")
+		log.Fatalln(messages.MissingTgKey)
 	}
 
 	bot, err := tg.NewBotAPI(apiKey)
@@ -34,7 +35,12 @@ func main() {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			response := gpt.GetResponse(update.Message.Text)
+			command, err := commands.GetCommand(update.Message.Text)
+			if err != nil {
+				log.Printf(err.Error())
+			}
+
+			response := command.RunCommand()
 
 			message := tg.NewMessage(update.Message.Chat.ID, response)
 			message.ReplyToMessageID = update.Message.MessageID
