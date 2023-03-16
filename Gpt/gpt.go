@@ -15,7 +15,7 @@ func GetResponse(question string) string {
 		log.Fatalln(messages.MissingGptKey)
 	}
 
-	client := openai.NewClient("your token")
+	client := openai.NewClient(apiKey)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
