@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/sashabaranov/go-openai v1.5.2 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
 	golang.org/x/net v0.4.0 // indirect
 )
