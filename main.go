@@ -3,6 +3,7 @@ package main
 import (
 	"CallFrescoBot/pkg/commands"
 	"CallFrescoBot/pkg/messages"
+	"CallFrescoBot/pkg/validator"
 	"log"
 	"os"
 
@@ -11,7 +12,11 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		return
+	}
+
 	apiKey := os.Getenv("TELEGRAM_API_KEY")
 	if apiKey == "" {
 		log.Fatalln(messages.MissingTgKey)
@@ -34,18 +39,26 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			messageText, err := validator.Validate(update.Message.Text)
 
-			command, err := commands.GetCommand(update.Message.Text)
 			if err != nil {
 				log.Printf(err.Error())
+				SendMessage(update, bot, messageText)
+				continue
 			}
 
-			response := command.RunCommand()
-
-			message := tg.NewMessage(update.Message.Chat.ID, response)
-			message.ReplyToMessageID = update.Message.MessageID
-
-			bot.Send(message)
+			response := commands.GetCommand(messageText).RunCommand()
+			SendMessage(update, bot, response)
 		}
+	}
+}
+
+func SendMessage(update tg.Update, bot *tg.BotAPI, msgText string) {
+	message := tg.NewMessage(update.Message.Chat.ID, msgText)
+	message.ReplyToMessageID = update.Message.MessageID
+
+	_, err := bot.Send(message)
+	if err != nil {
+		log.Printf(err.Error())
 	}
 }

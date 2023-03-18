@@ -4,13 +4,13 @@ type Factory interface {
 	RunCommand() ICommand
 }
 
-func GetCommand(cmd string) (ICommand, error) {
+func GetCommand(cmd string) ICommand {
 	switch cmd {
 	default:
-		return GptCommand{Message: cmd}, nil
+		return GptCommand{Message: cmd}
 	case Start:
-		return StartCommand{}, nil
+		return StartCommand{}
 	case Status:
-		return StatusCommand{}, nil
+		return StatusCommand{}
 	}
 }
