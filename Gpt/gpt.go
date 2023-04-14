@@ -1,18 +1,24 @@
 package gpt
 
 import (
-	"CallFrescoBot/pkg/messages"
+	"CallFrescoBot/pkg/consts"
+	"CallFrescoBot/pkg/models"
+	messageService "CallFrescoBot/pkg/service/message"
+	"CallFrescoBot/pkg/utils"
 	"context"
-	"log"
-	"os"
-
 	openai "github.com/sashabaranov/go-openai"
+	"log"
 )
 
-func GetResponse(question string) string {
-	apiKey := os.Getenv("GPT_API_KEY")
+var apiKey string
+
+func init() {
+	apiKey = utils.GetEnvVar("GPT_API_KEY")
+}
+
+func GetResponse(question string, user *models.User) string {
 	if apiKey == "" {
-		log.Fatalln(messages.MissingGptKey)
+		log.Fatalln(consts.MissingGptKey)
 	}
 
 	client := openai.NewClient(apiKey)
@@ -32,7 +38,12 @@ func GetResponse(question string) string {
 	if err != nil {
 		log.Println(err)
 
-		return messages.ErrorMsg
+		return consts.ErrorMsg
+	}
+
+	err = messageService.CreateMessage(user.Id, question, resp.Choices[0].Message.Content)
+	if err != nil {
+		return consts.ErrorMsg
 	}
 
 	return resp.Choices[0].Message.Content

@@ -1,53 +1,53 @@
 package main
 
 import (
+	"CallFrescoBot/app"
 	"CallFrescoBot/pkg/commands"
-	"CallFrescoBot/pkg/messages"
-	"CallFrescoBot/pkg/validator"
-	"log"
-	"os"
-
+	messageService "CallFrescoBot/pkg/service/message"
+	UserService "CallFrescoBot/pkg/service/user"
+	"CallFrescoBot/pkg/utils"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/joho/godotenv"
+	"log"
 )
 
+var userValidatorMessage string
+var messageValidatorText string
+
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		return
-	}
-
-	apiKey := os.Getenv("TELEGRAM_API_KEY")
-	if apiKey == "" {
-		log.Fatalln(messages.MissingTgKey)
-	}
-
-	bot, err := tg.NewBotAPI(apiKey)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	app.SetupApp()
 
 	upd := tg.NewUpdate(0)
 	upd.Timeout = 30
 
+	bot := utils.GetBot()
 	updates := bot.GetUpdatesChan(upd)
 
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			messageText, err := validator.Validate(update.Message.Text)
-
+			user, err := UserService.GetOrCreate(update.Message.From)
 			if err != nil {
 				log.Printf(err.Error())
-				SendMessage(update, bot, messageText)
 				continue
 			}
 
-			response := commands.GetCommand(messageText).RunCommand()
+			userValidatorMessage, err = UserService.ValidateUser(user)
+			if err != nil {
+				log.Printf(err.Error())
+				SendMessage(update, bot, userValidatorMessage)
+				continue
+			}
+
+			messageValidatorText, err = messageService.ValidateMessage(update.Message.Text)
+
+			if err != nil {
+				log.Printf(err.Error())
+				SendMessage(update, bot, messageValidatorText)
+				continue
+			}
+
+			response := commands.GetCommand(update.Message.Text, user).RunCommand()
+
 			SendMessage(update, bot, response)
 		}
 	}

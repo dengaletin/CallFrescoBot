@@ -1,11 +1,13 @@
 package commands
 
-import "CallFrescoBot/pkg/messages"
+import (
+	"CallFrescoBot/pkg/consts"
+)
 
 type StartCommand struct {
 	Message string
 }
 
 func (cmd StartCommand) RunCommand() string {
-	return messages.StartMsg
+	return consts.StartMsg
 }
