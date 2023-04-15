@@ -23,17 +23,23 @@ func (cmd StatusCommand) RunCommand() string {
 		return ""
 	}
 
-	subscriptionLimit := subscriptionRepository.GetUserSubscriptionLimit(cmd.User, db)
-	subscriptionName := ResolveSubscriptionName(subscriptionLimit)
-	messagesCount, err := messageRepository.CountMessagesByUserAndDate(cmd.User, subscriptionLimit, time.Now().AddDate(0, 0, -1), db)
+	subscription, err := subscriptionRepository.GetUserSubscription(cmd.User, db)
 	if err != nil {
 		log.Printf(err.Error())
 		return ""
 	}
 
-	remainingMessages := RemainingMessages(int64(subscriptionLimit), messagesCount)
+	subscriptionName := ResolveSubscriptionName(subscription.Limit)
+	messagesCount, err := messageRepository.CountMessagesByUserAndDate(cmd.User, subscription.Limit, time.Now().AddDate(0, 0, -1), db)
+	if err != nil {
+		log.Printf(err.Error())
+		return ""
+	}
 
-	status := fmt.Sprintf(consts.StatusMsg, subscriptionName, subscriptionLimit, remainingMessages)
+	remainingMessages := RemainingMessages(int64(subscription.Limit), messagesCount)
+	validDue := SubscriptionValidDue(subscription)
+
+	status := fmt.Sprintf(consts.StatusMsg, subscriptionName, subscription.Limit, remainingMessages, validDue)
 
 	return status
 }
@@ -62,4 +68,12 @@ func ResolveSubscriptionName(limit int) string {
 	default:
 		return consts.SubscriptionPlanHacker
 	}
+}
+
+func SubscriptionValidDue(subscription *models.Subscription) string {
+	if subscription.ActiveDue.IsZero() {
+		return "❌ No active subscriptions"
+	}
+
+	return subscription.ActiveDue.Format("02.01.2006")
 }

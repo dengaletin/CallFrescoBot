@@ -6,14 +6,19 @@ import (
 	"time"
 )
 
-func GetUserSubscriptionLimit(user *models.User, db *gorm.DB) int {
+func GetUserSubscription(user *models.User, db *gorm.DB) (*models.Subscription, error) {
 	var subscription *models.Subscription
 
 	result := db.Where("user_id = ? AND active_due > ?", user.Id, time.Now()).Find(&subscription)
 
-	if result.Error != nil || result.RowsAffected < 1 {
-		return 15
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
-	return subscription.Limit
+	if result.RowsAffected < 1 {
+		subscription.Limit = 15
+		return subscription, nil
+	}
+
+	return subscription, nil
 }

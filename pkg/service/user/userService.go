@@ -36,17 +36,21 @@ func ValidateUser(user *models.User) (string, error) {
 		return "Sorry man, your profile is not active", errors.New("profile is not active")
 	}
 
-	subscriptionLimit := subscriptionRepository.GetUserSubscriptionLimit(user, db)
-	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, subscriptionLimit, time.Now().AddDate(0, 0, -1), db)
+	subscription, err := subscriptionRepository.GetUserSubscription(user, db)
 	if err != nil {
 		return "", err
 	}
 
-	if int64(subscriptionLimit) == 0 {
+	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, subscription.Limit, time.Now().AddDate(0, 0, -1), db)
+	if err != nil {
+		return "", err
+	}
+
+	if int64(subscription.Limit) == 0 {
 		return "", nil
 	}
 
-	if messagesCount >= int64(subscriptionLimit) {
+	if messagesCount >= int64(subscription.Limit) {
 		return consts.RunOutOfMessages, errors.New("out of messages")
 	}
 
