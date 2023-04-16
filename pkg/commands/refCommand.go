@@ -58,13 +58,13 @@ func (cmd RefCommand) RunCommand() string {
 		return consts.StartMsg
 	}
 
-	_, err = subscriptionService.GetOrCreate(user, 50, consts.RefDaysMultiplier)
+	_, err = userRefService.Create(user, cmd.User)
 	if err != nil {
 		log.Printf(err.Error())
 		return consts.StartMsg
 	}
 
-	_, err = userRefService.Create(user, cmd.User)
+	_, err = subscriptionService.GetOrCreate(user, 50, consts.RefDaysMultiplier)
 	if err != nil {
 		log.Printf(err.Error())
 		return consts.StartMsg
