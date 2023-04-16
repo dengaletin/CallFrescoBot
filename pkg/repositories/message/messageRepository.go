@@ -24,7 +24,7 @@ func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time, db
 	result := db.Where("user_id = ? AND created_at > ?", user.Id, date.String()).Find(&messages).Limit(limit)
 
 	if result.Error != nil && result.RowsAffected != 1 {
-		return 0, errors.New("error occurred while creating a new message")
+		return 0, errors.New("error occurred while counting messages")
 	}
 
 	return result.RowsAffected, nil

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	models "CallFrescoBot/pkg/models"
+	"CallFrescoBot/pkg/models"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -74,6 +74,6 @@ func AutoMigrateDB() error {
 		return connErr
 	}
 
-	err := db.AutoMigrate(&models.User{}, &models.Message{}, &models.Subscription{})
+	err := db.AutoMigrate(&models.User{}, &models.Message{}, &models.Subscription{}, &models.UserRef{})
 	return err
 }

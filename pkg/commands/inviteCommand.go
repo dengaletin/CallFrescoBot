@@ -1,25 +1,19 @@
 package commands
 
 import (
-	gpt "CallFrescoBot/Gpt"
+	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
-	userService "CallFrescoBot/pkg/service/user"
+	"fmt"
 	"log"
 )
 
-type GptCommand struct {
+type InviteCommand struct {
 	Message string
 	User    *models.User
 }
 
-func (cmd GptCommand) Common() string {
-	userValidatorMessage, err := userService.ValidateUser(cmd.User)
-	if err != nil {
-		log.Printf(err.Error())
-		return userValidatorMessage
-	}
-
+func (cmd InviteCommand) Common() string {
 	messageValidatorText, err := messageService.ValidateMessage(cmd.Message)
 	if err != nil {
 		log.Printf(err.Error())
@@ -29,12 +23,14 @@ func (cmd GptCommand) Common() string {
 	return ""
 }
 
-func (cmd GptCommand) RunCommand() string {
+func (cmd InviteCommand) RunCommand() string {
 	result := cmd.Common()
 
 	if result != "" {
 		return result
 	}
 
-	return gpt.GetResponse(cmd.Message, cmd.User)
+	inviteLink := fmt.Sprintf(consts.InviteLink, cmd.User.TgId)
+
+	return inviteLink
 }

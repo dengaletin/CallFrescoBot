@@ -3,15 +3,11 @@ package main
 import (
 	"CallFrescoBot/app"
 	"CallFrescoBot/pkg/commands"
-	messageService "CallFrescoBot/pkg/service/message"
 	UserService "CallFrescoBot/pkg/service/user"
 	"CallFrescoBot/pkg/utils"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 )
-
-var userValidatorMessage string
-var messageValidatorText string
 
 func main() {
 	app.SetupApp()
@@ -28,21 +24,6 @@ func main() {
 			user, err := UserService.GetOrCreate(update.Message.From)
 			if err != nil {
 				log.Printf(err.Error())
-				continue
-			}
-
-			userValidatorMessage, err = UserService.ValidateUser(user)
-			if err != nil {
-				log.Printf(err.Error())
-				SendMessage(update, bot, userValidatorMessage)
-				continue
-			}
-
-			messageValidatorText, err = messageService.ValidateMessage(update.Message.Text)
-
-			if err != nil {
-				log.Printf(err.Error())
-				SendMessage(update, bot, messageValidatorText)
 				continue
 			}
 

@@ -4,8 +4,8 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageRepository "CallFrescoBot/pkg/repositories/message"
-	subscriptionRepository "CallFrescoBot/pkg/repositories/subscription"
 	"CallFrescoBot/pkg/repositories/user"
+	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	"CallFrescoBot/pkg/utils"
 	"errors"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -36,7 +36,7 @@ func ValidateUser(user *models.User) (string, error) {
 		return "Sorry man, your profile is not active", errors.New("profile is not active")
 	}
 
-	subscription, err := subscriptionRepository.GetUserSubscription(user, db)
+	subscription, err := subscriptionService.GetUserSubscriptionWithNoPlanLimit(user)
 	if err != nil {
 		return "", err
 	}
@@ -55,4 +55,18 @@ func ValidateUser(user *models.User) (string, error) {
 	}
 
 	return "", nil
+}
+
+func GerUserByTgId(tgId int64) (*models.User, error) {
+	db, err := utils.GetDatabaseConnection()
+	if err != nil {
+		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
+	}
+
+	user, err := userRepository.GerUserByTgId(tgId, db)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

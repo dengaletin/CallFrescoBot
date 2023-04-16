@@ -6,7 +6,7 @@ import (
 	messageService "CallFrescoBot/pkg/service/message"
 	"CallFrescoBot/pkg/utils"
 	"context"
-	openai "github.com/sashabaranov/go-openai"
+	"github.com/sashabaranov/go-openai"
 	"log"
 )
 

@@ -9,7 +9,20 @@ import (
 
 func FirstOrCreate(tgUser *tg.User, db *gorm.DB) (*models.User, error) {
 	var user *models.User
-	err := db.Where(models.User{TgId: tgUser.ID, Name: tgUser.UserName}).Assign(models.User{LastLogin: time.Now()}).FirstOrCreate(&user).Error
+	result := db.Where(models.User{TgId: tgUser.ID, Name: tgUser.UserName}).FirstOrCreate(&user)
+
+	if result.RowsAffected == 0 && user.IsNew == true {
+		db.Model(&user).Update("is_new", false)
+	} else if result.RowsAffected == 0 {
+		db.Model(&user).Update("last_login", time.Now())
+	}
+
+	return user, nil
+}
+
+func GerUserByTgId(tdId int64, db *gorm.DB) (*models.User, error) {
+	var user *models.User
+	err := db.Where(models.User{TgId: tdId}).First(&user).Error
 	if err != nil {
 		return nil, err
 	}

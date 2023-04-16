@@ -2,9 +2,11 @@ package messageService
 
 import (
 	"CallFrescoBot/pkg/consts"
+	"CallFrescoBot/pkg/models"
 	messageRepository "CallFrescoBot/pkg/repositories/message"
 	"CallFrescoBot/pkg/utils"
 	"errors"
+	"time"
 )
 
 func ValidateMessage(cmd string) (string, error) {
@@ -30,4 +32,19 @@ func CreateMessage(userId uint64, message string, response string) error {
 	}
 
 	return nil
+}
+
+func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time) (int64, error) {
+	db, err := utils.GetDatabaseConnection()
+	if err != nil {
+		return 0, errors.New("error occurred while getting a DB connection from the connection pool")
+	}
+
+	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, limit, date, db)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return messagesCount, nil
 }

@@ -3,9 +3,8 @@ package commands
 import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
-	messageRepository "CallFrescoBot/pkg/repositories/message"
-	subscriptionRepository "CallFrescoBot/pkg/repositories/subscription"
-	"CallFrescoBot/pkg/utils"
+	messageService "CallFrescoBot/pkg/service/message"
+	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	"fmt"
 	"log"
 	"time"
@@ -16,21 +15,31 @@ type StatusCommand struct {
 	User    *models.User
 }
 
-func (cmd StatusCommand) RunCommand() string {
-	db, err := utils.GetDatabaseConnection()
+func (cmd StatusCommand) Common() string {
+	messageValidatorText, err := messageService.ValidateMessage(cmd.Message)
 	if err != nil {
 		log.Printf(err.Error())
-		return ""
+		return messageValidatorText
 	}
 
-	subscription, err := subscriptionRepository.GetUserSubscription(cmd.User, db)
+	return ""
+}
+
+func (cmd StatusCommand) RunCommand() string {
+	result := cmd.Common()
+
+	if result != "" {
+		return result
+	}
+
+	subscription, err := subscriptionService.GetUserSubscriptionWithNoPlanLimit(cmd.User)
 	if err != nil {
 		log.Printf(err.Error())
 		return ""
 	}
 
 	subscriptionName := ResolveSubscriptionName(subscription.Limit)
-	messagesCount, err := messageRepository.CountMessagesByUserAndDate(cmd.User, subscription.Limit, time.Now().AddDate(0, 0, -1), db)
+	messagesCount, err := messageService.CountMessagesByUserAndDate(cmd.User, subscription.Limit, time.Now().AddDate(0, 0, -1))
 	if err != nil {
 		log.Printf(err.Error())
 		return ""
