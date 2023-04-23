@@ -24,22 +24,19 @@ func main() {
 			user, err := UserService.GetOrCreate(update.Message.From)
 			if err != nil {
 				log.Printf(err.Error())
-				continue
 			}
 
-			response := commands.GetCommand(update.Message.Text, user).RunCommand()
+			response, err := commands.GetCommand(update, user).RunCommand()
+			if err != nil {
+				log.Printf(err.Error())
+			}
 
-			SendMessage(update, bot, response)
+			if response != nil {
+				_, err = bot.Send(response)
+				if err != nil {
+					log.Printf(err.Error())
+				}
+			}
 		}
-	}
-}
-
-func SendMessage(update tg.Update, bot *tg.BotAPI, msgText string) {
-	message := tg.NewMessage(update.Message.Chat.ID, msgText)
-	message.ReplyToMessageID = update.Message.MessageID
-
-	_, err := bot.Send(message)
-	if err != nil {
-		log.Printf(err.Error())
 	}
 }

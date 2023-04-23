@@ -6,43 +6,39 @@ import (
 	messageService "CallFrescoBot/pkg/service/message"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	"fmt"
-	"log"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"time"
 )
 
 type StatusCommand struct {
-	Message string
-	User    *models.User
+	Update tg.Update
+	User   *models.User
 }
 
-func (cmd StatusCommand) Common() string {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Message)
+func (cmd StatusCommand) Common() (string, error) {
+	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
 	if err != nil {
-		log.Printf(err.Error())
-		return messageValidatorText
+		return messageValidatorText, err
 	}
 
-	return ""
+	return "", nil
 }
 
-func (cmd StatusCommand) RunCommand() string {
-	result := cmd.Common()
-
-	if result != "" {
-		return result
+func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
+	result, err := cmd.Common()
+	if err != nil {
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
 	subscription, err := subscriptionService.GetUserSubscriptionWithNoPlanLimit(cmd.User)
 	if err != nil {
-		log.Printf(err.Error())
-		return ""
+		return nil, err
 	}
 
 	subscriptionName := ResolveSubscriptionName(subscription.Limit)
 	messagesCount, err := messageService.CountMessagesByUserAndDate(cmd.User, subscription.Limit, time.Now().AddDate(0, 0, -1))
 	if err != nil {
-		log.Printf(err.Error())
-		return ""
+		return nil, err
 	}
 
 	remainingMessages := RemainingMessages(int64(subscription.Limit), messagesCount)
@@ -50,7 +46,7 @@ func (cmd StatusCommand) RunCommand() string {
 
 	status := fmt.Sprintf(consts.StatusMsg, subscriptionName, subscription.Limit, remainingMessages, validDue)
 
-	return status
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, status), nil
 }
 
 func RemainingMessages(subscriptionLimit int64, messagesCount int64) int64 {

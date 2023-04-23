@@ -10,4 +10,5 @@ type User struct {
 	CreatedAt time.Time `gorm:"autoCreateTime:milli"`
 	LastLogin time.Time `gorm:"autoUpdateTime:milli"`
 	IsNew     bool      `gorm:"not null;default:1"`
+	Mode      int64     `gorm:"not null;default:0"`
 }

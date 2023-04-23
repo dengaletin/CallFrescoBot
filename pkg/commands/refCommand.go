@@ -7,68 +7,61 @@ import (
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	userRefService "CallFrescoBot/pkg/service/userRef"
-	"log"
+	"errors"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"strconv"
 	"strings"
 )
 
 type RefCommand struct {
-	Message string
-	User    *models.User
+	Update tg.Update
+	User   *models.User
 }
 
-func (cmd RefCommand) Common() string {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Message)
+func (cmd RefCommand) Common() (string, error) {
+	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
 	if err != nil {
-		log.Printf(err.Error())
-		return messageValidatorText
+		return messageValidatorText, err
 	}
 
-	return ""
+	return "", nil
 }
 
-func (cmd RefCommand) RunCommand() string {
-	result := cmd.Common()
-
-	if result != "" {
-		return result
+func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
+	result, err := cmd.Common()
+	if err != nil {
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	message := strings.TrimPrefix(cmd.Message, "/start ref")
+	message := strings.TrimPrefix(cmd.Update.Message.Text, "/start ref")
 
 	id, err := strconv.ParseInt(message, 10, 64)
 	if err != nil {
-		log.Printf(err.Error())
-		return consts.StartMsg
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
 	}
 
 	if id == cmd.User.TgId {
-		log.Printf("The user is trying to invite himself.")
-		return consts.StartMsg
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), errors.New("the user is trying to invite himself")
 	}
 
 	if !cmd.User.IsNew {
-		log.Printf("The user is not new.")
-		return consts.StartMsg
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), errors.New("the user is not new")
 	}
 
 	user, err := userService.GerUserByTgId(id)
 	if err != nil {
-		log.Printf(err.Error())
-		return consts.StartMsg
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
 	}
 
 	_, err = userRefService.Create(user, cmd.User)
 	if err != nil {
-		log.Printf(err.Error())
-		return consts.StartMsg
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
 	}
 
 	_, err = subscriptionService.GetOrCreate(user, 50, consts.RefDaysMultiplier)
 	if err != nil {
-		log.Printf(err.Error())
-		return consts.StartMsg
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
 	}
 
-	return consts.StartMsg
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), nil
 }

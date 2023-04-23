@@ -6,8 +6,9 @@ import (
 	messageService "CallFrescoBot/pkg/service/message"
 	"CallFrescoBot/pkg/utils"
 	"context"
+	"errors"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
-	"log"
 )
 
 var apiKey string
@@ -16,9 +17,9 @@ func init() {
 	apiKey = utils.GetEnvVar("GPT_API_KEY")
 }
 
-func GetResponse(question string, user *models.User) string {
+func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	if apiKey == "" {
-		log.Fatalln(consts.MissingGptKey)
+		return nil, errors.New(consts.MissingGptKey)
 	}
 
 	client := openai.NewClient(apiKey)
@@ -29,22 +30,23 @@ func GetResponse(question string, user *models.User) string {
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: question,
+					Content: update.Message.Text,
 				},
 			},
 		},
 	)
 
 	if err != nil {
-		log.Println(err)
-
-		return consts.ErrorMsg
+		return nil, err
 	}
 
-	err = messageService.CreateMessage(user.Id, question, resp.Choices[0].Message.Content)
+	err = messageService.CreateMessage(user.Id, update.Message.Text, resp.Choices[0].Message.Content)
 	if err != nil {
-		return consts.ErrorMsg
+		return nil, err
 	}
 
-	return resp.Choices[0].Message.Content
+	message := tg.NewMessage(update.Message.Chat.ID, resp.Choices[0].Message.Content)
+	message.ReplyToMessageID = update.Message.MessageID
+
+	return message, nil
 }

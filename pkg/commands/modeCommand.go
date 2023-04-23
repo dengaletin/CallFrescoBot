@@ -1,25 +1,22 @@
 package commands
 
 import (
-	gpt "CallFrescoBot/Gpt"
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
 	userService "CallFrescoBot/pkg/service/user"
+	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"strconv"
+	"strings"
 )
 
-type GptCommand struct {
+type ModeCommand struct {
 	Update tg.Update
 	User   *models.User
 }
 
-func (cmd GptCommand) Common() (string, error) {
-	userValidatorMessage, err := userService.ValidateUser(cmd.User)
-	if err != nil {
-		return userValidatorMessage, err
-	}
-
+func (cmd ModeCommand) Common() (string, error) {
 	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
 	if err != nil {
 		return messageValidatorText, err
@@ -28,16 +25,27 @@ func (cmd GptCommand) Common() (string, error) {
 	return "", nil
 }
 
-func (cmd GptCommand) RunCommand() (tg.Chattable, error) {
+func (cmd ModeCommand) RunCommand() (tg.Chattable, error) {
 	result, err := cmd.Common()
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	gptResponse, err := gpt.GetResponse(cmd.Update, cmd.User)
+	mode := strings.TrimPrefix(cmd.Update.Message.Text, "/mode")
+	id, err := strconv.ParseInt(mode, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	err = userService.SetMode(id, cmd.User)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
 	}
 
-	return gptResponse, nil
+	modeName, err := userService.GetMode(id)
+	if err != nil {
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
+	}
+
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, fmt.Sprintf(consts.ModeSuccess, modeName)), nil
 }

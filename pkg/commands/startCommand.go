@@ -4,30 +4,28 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
-	"log"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type StartCommand struct {
-	Message string
-	User    *models.User
+	Update tg.Update
+	User   *models.User
 }
 
-func (cmd StartCommand) Common() string {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Message)
+func (cmd StartCommand) Common() (string, error) {
+	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
 	if err != nil {
-		log.Printf(err.Error())
-		return messageValidatorText
+		return messageValidatorText, err
 	}
 
-	return ""
+	return "", nil
 }
 
-func (cmd StartCommand) RunCommand() string {
-	result := cmd.Common()
-
-	if result != "" {
-		return result
+func (cmd StartCommand) RunCommand() (tg.Chattable, error) {
+	result, err := cmd.Common()
+	if err != nil {
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	return consts.StartMsg
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), nil
 }

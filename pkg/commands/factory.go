@@ -2,6 +2,7 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/models"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"regexp"
 )
 
@@ -9,21 +10,31 @@ type Factory interface {
 	RunCommand() ICommand
 }
 
-func GetCommand(cmd string, user *models.User) ICommand {
+func GetCommand(cmd tgbotapi.Update, user *models.User) ICommand {
 	re := regexp.MustCompile(`^/start ref[0-9]+$`)
-	match := re.FindStringSubmatch(cmd)
+	match := re.FindStringSubmatch(cmd.Message.Text)
 	if len(match) != 0 {
-		return RefCommand{Message: cmd, User: user}
+		return RefCommand{Update: cmd, User: user}
 	}
 
-	switch cmd {
+	reMode := regexp.MustCompile(`^/mode[0-9]$`)
+	matchMode := reMode.FindStringSubmatch(cmd.Message.Text)
+	if len(matchMode) != 0 {
+		return ModeCommand{Update: cmd, User: user}
+	}
+
+	switch cmd.Message.Text {
 	default:
-		return GptCommand{Message: cmd, User: user}
+		if user.Mode != 0 {
+			return DalleCommand{Update: cmd, User: user}
+		}
+
+		return GptCommand{Update: cmd, User: user}
 	case Start:
-		return StartCommand{Message: cmd, User: user}
+		return StartCommand{Update: cmd, User: user}
 	case Status:
-		return StatusCommand{Message: cmd, User: user}
+		return StatusCommand{Update: cmd, User: user}
 	case Invite:
-		return InviteCommand{Message: cmd, User: user}
+		return InviteCommand{Update: cmd, User: user}
 	}
 }

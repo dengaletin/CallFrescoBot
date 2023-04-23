@@ -2,7 +2,9 @@ package userRepository
 
 import (
 	"CallFrescoBot/pkg/models"
+	"errors"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"golang.org/x/exp/slices"
 	"gorm.io/gorm"
 	"time"
 )
@@ -28,4 +30,32 @@ func GerUserByTgId(tdId int64, db *gorm.DB) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func SetMode(mode int64, user *models.User, db *gorm.DB) error {
+	modes := []int64{0, 1}
+	modeStatus := slices.Contains(modes, mode)
+
+	if modeStatus == false {
+		return errors.New("incorrect mode")
+	}
+
+	result := db.Model(&user).Update("mode", mode)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func GetMode(mode int64) (string, error) {
+	switch mode {
+	case 0:
+		return "ChatGpt", nil
+	case 1:
+		return "Dalle2", nil
+	default:
+		return "", errors.New("unknown mode")
+	}
 }

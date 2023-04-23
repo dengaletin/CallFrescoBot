@@ -70,3 +70,26 @@ func GerUserByTgId(tgId int64) (*models.User, error) {
 
 	return user, nil
 }
+
+func SetMode(mode int64, user *models.User) error {
+	db, err := utils.GetDatabaseConnection()
+	if err != nil {
+		return errors.New("error occurred while getting a DB connection from the connection pool")
+	}
+
+	err = userRepository.SetMode(mode, user, db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetMode(mode int64) (string, error) {
+	result, err := userRepository.GetMode(mode)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
