@@ -1,4 +1,4 @@
-package Dalle2
+package Dalle3
 
 import (
 	"CallFrescoBot/pkg/consts"
@@ -28,8 +28,9 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	ctx := context.Background()
 
 	reqBase64 := openai.ImageRequest{
+		Model:          openai.CreateImageModelDallE3,
 		Prompt:         update.Message.Text,
-		Size:           openai.CreateImageSize1024x1024,
+		Size:           openai.CreateImageSize1792x1024,
 		ResponseFormat: openai.CreateImageResponseFormatB64JSON,
 		N:              1,
 	}

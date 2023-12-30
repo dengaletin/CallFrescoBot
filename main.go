@@ -21,7 +21,7 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			user, err := UserService.GetOrCreate(update.Message.From)
+			user, err := UserService.GetOrCreate(update)
 			if err != nil {
 				log.Printf(err.Error())
 			}

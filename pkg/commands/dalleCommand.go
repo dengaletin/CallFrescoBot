@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"CallFrescoBot/Dalle2"
+	"CallFrescoBot/Dalle3"
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
@@ -34,7 +34,7 @@ func (cmd DalleCommand) RunCommand() (tg.Chattable, error) {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	dalleResponse, err := Dalle2.GetResponse(cmd.Update, cmd.User)
+	dalleResponse, err := Dalle3.GetResponse(cmd.Update, cmd.User)
 
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err

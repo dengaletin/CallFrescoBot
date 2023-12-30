@@ -8,17 +8,17 @@ import (
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	"CallFrescoBot/pkg/utils"
 	"errors"
-	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"time"
 )
 
-func GetOrCreate(tgUser *tg.User) (*models.User, error) {
+func GetOrCreate(cmd tgbotapi.Update) (*models.User, error) {
 	db, err := utils.GetDatabaseConnection()
 	if err != nil {
 		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
 	}
 
-	user, err := userRepository.FirstOrCreate(tgUser, db)
+	user, err := userRepository.FirstOrCreate(cmd.Message.From, cmd.Message.Chat.ID, db)
 	if err != nil {
 		return nil, err
 	}

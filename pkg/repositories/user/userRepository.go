@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func FirstOrCreate(tgUser *tg.User, db *gorm.DB) (*models.User, error) {
+func FirstOrCreate(tgUser *tg.User, chatId int64, db *gorm.DB) (*models.User, error) {
 	var user *models.User
 	result := db.Where(models.User{TgId: tgUser.ID, Name: tgUser.UserName}).FirstOrCreate(&user)
 
@@ -18,6 +18,8 @@ func FirstOrCreate(tgUser *tg.User, db *gorm.DB) (*models.User, error) {
 	} else if result.RowsAffected == 0 {
 		db.Model(&user).Update("last_login", time.Now())
 	}
+
+	db.Model(&user).Update("chat_id", chatId)
 
 	return user, nil
 }
@@ -54,7 +56,7 @@ func GetMode(mode int64) (string, error) {
 	case 0:
 		return "ChatGpt", nil
 	case 1:
-		return "Dalle2", nil
+		return "Dalle3", nil
 	default:
 		return "", errors.New("unknown mode")
 	}
