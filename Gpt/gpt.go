@@ -35,7 +35,7 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	}
 
 	if user.Dialog == 1 {
-		userMessages, err := messageService.GetMessagesByUser(user, 100)
+		userMessages, err := messageService.GetMessagesByUser(user, 30)
 		if err != nil {
 			return nil, err
 		}
