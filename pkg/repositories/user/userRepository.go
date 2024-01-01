@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func FirstOrCreate(tgUser *tg.User, chatId int64, db *gorm.DB) (*models.User, error) {
+func FirstOrCreate(tgUser *tg.User, db *gorm.DB) (*models.User, error) {
 	var user *models.User
 	result := db.Where(models.User{TgId: tgUser.ID, Name: tgUser.UserName}).FirstOrCreate(&user)
 
@@ -18,8 +18,6 @@ func FirstOrCreate(tgUser *tg.User, chatId int64, db *gorm.DB) (*models.User, er
 	} else if result.RowsAffected == 0 {
 		db.Model(&user).Update("last_login", time.Now())
 	}
-
-	db.Model(&user).Update("chat_id", chatId)
 
 	return user, nil
 }
@@ -51,6 +49,23 @@ func SetMode(mode int64, user *models.User, db *gorm.DB) error {
 	return nil
 }
 
+func SetDialogStatus(dialogStatus int64, user *models.User, db *gorm.DB) error {
+	allowedValue := []int64{0, 1}
+	dialogStatusValue := slices.Contains(allowedValue, dialogStatus)
+
+	if dialogStatusValue == false {
+		return errors.New("incorrect value")
+	}
+
+	result := db.Model(&user).Update("dialog", dialogStatus)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func GetMode(mode int64) (string, error) {
 	switch mode {
 	case 0:
@@ -59,5 +74,16 @@ func GetMode(mode int64) (string, error) {
 		return "Dalle3", nil
 	default:
 		return "", errors.New("unknown mode")
+	}
+}
+
+func GetDialogStatus(dialogStatus int64) (string, error) {
+	switch dialogStatus {
+	case 0:
+		return "OFF", nil
+	case 1:
+		return "ON", nil
+	default:
+		return "", errors.New("UNKNOWN")
 	}
 }

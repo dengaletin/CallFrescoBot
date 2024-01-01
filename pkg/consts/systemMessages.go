@@ -19,6 +19,7 @@ const (
 	SubscriptionPlanGigaSheikh = "🇦🇪 GigaSheikh"
 	SubscriptionPlanHacker     = "🦄 Hacker"
 	ModeSuccess                = "💚 Mode %s"
+	DialogSuccess              = "🧠 Dialog mode: %s"
 	RunOutOfMessages           = "🦄 Sorry, you ran out of messages\n\n💬 Contact: \n@dendefoe\n\n💚 Invite your friend and get a free \"Student\" plan for a week. To get a referral link, use the command /invite\n\n💸 Buy subscription: \nhttps://www.donationalerts.com/r/dendefoe"
 	InviteLink                 = "💚 Share with your friend and get the 🤓 Student Plan for a week: \n🔗 https://t.me/call_fresco_bot?start=ref%d"
 )

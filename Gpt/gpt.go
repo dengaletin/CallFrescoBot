@@ -23,17 +23,42 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	}
 
 	client := openai.NewClient(apiKey)
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT4,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: update.Message.Text,
-				},
+
+	request := openai.ChatCompletionRequest{
+		Model: openai.GPT4,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: "",
 			},
 		},
+	}
+
+	if user.Dialog == 1 {
+		userMessages, err := messageService.GetMessagesByUser(user, 100)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, userMessage := range userMessages {
+			request.Messages = append(request.Messages, openai.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleUser,
+				Content: userMessage.Message,
+			}, openai.ChatCompletionMessage{
+				Role:    openai.ChatMessageRoleAssistant,
+				Content: userMessage.Response,
+			})
+		}
+	}
+
+	request.Messages = append(request.Messages, openai.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleUser,
+		Content: update.Message.Text,
+	})
+
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		request,
 	)
 
 	if err != nil {

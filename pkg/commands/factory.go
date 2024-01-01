@@ -23,6 +23,12 @@ func GetCommand(cmd tgbotapi.Update, user *models.User) ICommand {
 		return ModeCommand{Update: cmd, User: user}
 	}
 
+	reDialog := regexp.MustCompile(`^/dialog[0-9]$`)
+	matchDialog := reDialog.FindStringSubmatch(cmd.Message.Text)
+	if len(matchDialog) != 0 {
+		return DialogCommand{Update: cmd, User: user}
+	}
+
 	switch cmd.Message.Text {
 	default:
 		if user.Mode != 0 {

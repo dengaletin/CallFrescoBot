@@ -48,3 +48,18 @@ func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time) (i
 
 	return messagesCount, nil
 }
+
+func GetMessagesByUser(user *models.User, limit int) ([]models.Message, error) {
+	db, err := utils.GetDatabaseConnection()
+	if err != nil {
+		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
+	}
+
+	messages, err := messageRepository.GetMessagesByUser(user, limit, db)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}

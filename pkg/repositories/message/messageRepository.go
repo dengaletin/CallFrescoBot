@@ -29,3 +29,15 @@ func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time, db
 
 	return result.RowsAffected, nil
 }
+
+func GetMessagesByUser(user *models.User, limit int, db *gorm.DB) ([]models.Message, error) {
+	var messages []models.Message
+
+	err := db.Where("user_id = ?", user.Id).Order("created_at desc").Limit(limit).Find(&messages).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}
