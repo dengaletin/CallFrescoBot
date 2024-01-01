@@ -42,5 +42,7 @@ func GetCommand(cmd tgbotapi.Update, user *models.User) ICommand {
 		return StatusCommand{Update: cmd, User: user}
 	case Invite:
 		return InviteCommand{Update: cmd, User: user}
+	case Buy:
+		return BuyCommand{Update: cmd, User: user}
 	}
 }

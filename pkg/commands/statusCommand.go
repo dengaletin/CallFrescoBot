@@ -63,13 +63,13 @@ func ResolveSubscriptionName(limit int) string {
 	case limit == 0:
 		return consts.SubscriptionPlanHacker
 	case limit <= 15:
-		return consts.SubscriptionPlanBomj
+		return consts.SubscriptionPlanHomeless
 	case limit <= 50:
-		return consts.SubscriptionPlanStudent
+		return consts.SubscriptionPlanBasic
 	case limit <= 100:
-		return consts.SubscriptionPlanMajor
+		return consts.SubscriptionPlanVIP
 	case limit <= 200:
-		return consts.SubscriptionPlanGigaSheikh
+		return consts.SubscriptionPlanDeluxe
 	default:
 		return consts.SubscriptionPlanHacker
 	}
