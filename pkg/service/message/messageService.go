@@ -6,60 +6,69 @@ import (
 	messageRepository "CallFrescoBot/pkg/repositories/message"
 	"CallFrescoBot/pkg/utils"
 	"errors"
+	"fmt"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"gorm.io/gorm"
 	"time"
 )
 
 func ValidateMessage(cmd string) (string, error) {
 	if cmd == "" {
-		return consts.UnsupportedMessageType, errors.New("unsupported message type")
+		return consts.UnsupportedMessageType, errors.New(consts.UnsupportedMessageType)
 	}
 	if len([]rune(cmd)) < 4 {
-		return consts.MessageIsTooShort, errors.New("message is too short")
+		return consts.MessageIsTooShort, errors.New(consts.MessageIsTooShort)
 	}
 
 	return cmd, nil
 }
 
-func CreateMessage(userId uint64, message string, response string) error {
+func dbConnection() (*gorm.DB, error) {
 	db, err := utils.GetDatabaseConnection()
 	if err != nil {
-		return errors.New("error occurred while getting a DB connection from the connection pool")
+		return nil, errors.New("failed to obtain a db connection from the pool")
+	}
+
+	return db, nil
+}
+
+func CreateMessage(userId uint64, message string, response string) error {
+	db, err := dbConnection()
+	if err != nil {
+		return err
 	}
 
 	_, err = messageRepository.MessageCreate(userId, message, response, db)
+	return err
+}
+
+func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time) (int64, error) {
+	db, err := dbConnection()
+	if err != nil {
+		return 0, err
+	}
+
+	return messageRepository.CountMessagesByUserAndDate(user, limit, date, db)
+}
+
+func GetMessagesByUser(user *models.User, limit int) ([]models.Message, error) {
+	db, err := dbConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	return messageRepository.GetMessagesByUser(user, limit, db)
+}
+
+func SendErrorToUser(msgInfo string, err error) error {
+	info := fmt.Sprintf("❌❌❌ Error: [%s] %s", msgInfo, err.Error())
+	message := tg.NewMessage(6298977100, info)
+	bot := utils.GetBot()
+
+	_, err = bot.Send(message)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time) (int64, error) {
-	db, err := utils.GetDatabaseConnection()
-	if err != nil {
-		return 0, errors.New("error occurred while getting a DB connection from the connection pool")
-	}
-
-	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, limit, date, db)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return messagesCount, nil
-}
-
-func GetMessagesByUser(user *models.User, limit int) ([]models.Message, error) {
-	db, err := utils.GetDatabaseConnection()
-	if err != nil {
-		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
-	}
-
-	messages, err := messageRepository.GetMessagesByUser(user, limit, db)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return messages, nil
 }

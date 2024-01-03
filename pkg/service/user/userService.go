@@ -4,50 +4,48 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageRepository "CallFrescoBot/pkg/repositories/message"
-	"CallFrescoBot/pkg/repositories/user"
+	userRepository "CallFrescoBot/pkg/repositories/user"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	"CallFrescoBot/pkg/utils"
 	"errors"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"gorm.io/gorm"
 	"time"
 )
 
-func GetOrCreate(cmd tgbotapi.Update) (*models.User, error) {
+func dbConnection() (*gorm.DB, error) {
 	db, err := utils.GetDatabaseConnection()
 	if err != nil {
 		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
 	}
+	return db, nil
+}
 
-	user, err := userRepository.FirstOrCreate(cmd.Message.From, db)
+func GetOrCreate(cmd tgbotapi.Update) (*models.User, error) {
+	db, err := dbConnection()
 	if err != nil {
 		return nil, err
 	}
-
-	return user, nil
+	return userRepository.FirstOrCreate(cmd.Message.From, db)
 }
 
 func ValidateUser(user *models.User) (string, error) {
-	db, err := utils.GetDatabaseConnection()
+	db, err := dbConnection()
 	if err != nil {
-		return "", errors.New("error occurred while getting a DB connection from the connection pool")
+		return "", err
 	}
-
-	if user.IsActive != true {
-		return "Sorry man, your profile is not active", errors.New("profile is not active")
+	if !user.IsActive {
+		return "sorry, your profile is not active", errors.New("profile is not active")
 	}
-
 	subscription, err := subscriptionService.GetUserSubscriptionWithNoPlanLimit(user)
 	if err != nil {
 		return "", err
 	}
 
-	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, subscription.Limit, time.Now().AddDate(0, 0, -1), db)
+	limitDate := time.Now().AddDate(0, 0, -1)
+	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, subscription.Limit, limitDate, db)
 	if err != nil {
 		return "", err
-	}
-
-	if int64(subscription.Limit) == 0 {
-		return "", nil
 	}
 
 	if messagesCount >= int64(subscription.Limit) {
@@ -58,61 +56,33 @@ func ValidateUser(user *models.User) (string, error) {
 }
 
 func GerUserByTgId(tgId int64) (*models.User, error) {
-	db, err := utils.GetDatabaseConnection()
-	if err != nil {
-		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
-	}
-
-	user, err := userRepository.GerUserByTgId(tgId, db)
+	db, err := dbConnection()
 	if err != nil {
 		return nil, err
 	}
-
-	return user, nil
+	return userRepository.GerUserByTgId(tgId, db)
 }
 
 func SetMode(mode int64, user *models.User) error {
-	db, err := utils.GetDatabaseConnection()
-	if err != nil {
-		return errors.New("error occurred while getting a DB connection from the connection pool")
-	}
-
-	err = userRepository.SetMode(mode, user, db)
+	db, err := dbConnection()
 	if err != nil {
 		return err
 	}
-
-	return nil
+	return userRepository.SetMode(mode, user, db)
 }
 
 func SetDialogStatus(dialogStatus int64, user *models.User) error {
-	db, err := utils.GetDatabaseConnection()
-	if err != nil {
-		return errors.New("error occurred while getting a DB connection from the connection pool")
-	}
-
-	err = userRepository.SetDialogStatus(dialogStatus, user, db)
+	db, err := dbConnection()
 	if err != nil {
 		return err
 	}
-
-	return nil
+	return userRepository.SetDialogStatus(dialogStatus, user, db)
 }
 
 func GetMode(mode int64) (string, error) {
-	result, err := userRepository.GetMode(mode)
-	if err != nil {
-		return "", err
-	}
-
-	return result, nil
+	return userRepository.GetMode(mode)
 }
 
 func GetDialogStatus(dialogStatus int64) (string, error) {
-	result, err := userRepository.GetDialogStatus(dialogStatus)
-	if err != nil {
-		return "", err
-	}
-
-	return result, nil
+	return userRepository.GetDialogStatus(dialogStatus)
 }

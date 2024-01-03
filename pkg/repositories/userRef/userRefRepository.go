@@ -7,8 +7,8 @@ import (
 
 func Create(user *models.User, userRef *models.User, db *gorm.DB) (*models.UserRef, error) {
 	ref := &models.UserRef{
-		UserId:    user.Id,
-		UserRefId: userRef.Id,
+		UserId1: user.Id,
+		UserId2: userRef.Id,
 	}
 
 	result := db.Create(&ref)

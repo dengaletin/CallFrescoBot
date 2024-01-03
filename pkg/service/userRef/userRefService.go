@@ -2,21 +2,16 @@ package userRefService
 
 import (
 	"CallFrescoBot/pkg/models"
-	userRefRepository "CallFrescoBot/pkg/repositories/userRef"
+	"CallFrescoBot/pkg/repositories/userRef"
 	"CallFrescoBot/pkg/utils"
 	"errors"
 )
 
-func Create(user *models.User, refUser *models.User) (*models.UserRef, error) {
+func Create(user, refUser *models.User) (*models.UserRef, error) {
 	db, err := utils.GetDatabaseConnection()
 	if err != nil {
-		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
+		return nil, errors.New("failed getting database connection")
 	}
 
-	userRef, err := userRefRepository.Create(user, refUser, db)
-	if err != nil {
-		return nil, err
-	}
-
-	return userRef, nil
+	return userRefRepository.Create(user, refUser, db)
 }

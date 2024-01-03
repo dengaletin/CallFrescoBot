@@ -62,13 +62,13 @@ func ResolveSubscriptionName(limit int) string {
 	switch limit := limit; {
 	case limit == 0:
 		return consts.SubscriptionPlanHacker
-	case limit <= 15:
+	case limit <= 5:
 		return consts.SubscriptionPlanHomeless
-	case limit <= 50:
+	case limit <= 25:
 		return consts.SubscriptionPlanBasic
-	case limit <= 100:
+	case limit <= 50:
 		return consts.SubscriptionPlanVIP
-	case limit <= 200:
+	case limit <= 100:
 		return consts.SubscriptionPlanDeluxe
 	default:
 		return consts.SubscriptionPlanHacker

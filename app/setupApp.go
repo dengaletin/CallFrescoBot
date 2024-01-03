@@ -2,26 +2,30 @@ package app
 
 import (
 	"CallFrescoBot/pkg/utils"
+	"github.com/pkg/errors"
 	"log"
 )
 
 func SetupApp() {
-	log.Printf("Initializing service")
+	log.Println("Initializing service")
 
+	if err := createResources(); err != nil {
+		log.Printf("Error occurred while setting up the app: %s", err)
+	}
+}
+
+func createResources() error {
 	if err := utils.CreateDBConnection(); err != nil {
-		log.Printf("Error occurred while creating the database connection")
-		return
+		return errors.Wrap(err, "Failed to create database connection")
 	}
 
-	err := utils.AutoMigrateDB()
-	if err != nil {
-		log.Printf("Error occurred while auto migrating database")
-		return
+	if err := utils.AutoMigrateDB(); err != nil {
+		return errors.Wrap(err, "Failed to auto-migrate database")
 	}
 
-	err = utils.CreateBot()
-	if err != nil {
-		log.Printf("Error occurred while bot creating")
-		return
+	if err := utils.CreateBot(); err != nil {
+		return errors.Wrap(err, "Failed to create bot")
 	}
+
+	return nil
 }

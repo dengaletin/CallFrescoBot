@@ -58,7 +58,7 @@ func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
 	}
 
-	_, err = subscriptionService.GetOrCreate(user, 50, consts.RefDaysMultiplier)
+	_, err = subscriptionService.GetOrCreate(user, 25, consts.RefDaysMultiplier)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
 	}

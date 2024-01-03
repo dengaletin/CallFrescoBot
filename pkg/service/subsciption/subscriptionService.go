@@ -6,17 +6,34 @@ import (
 	subscriptionRepository "CallFrescoBot/pkg/repositories/subscription"
 	"CallFrescoBot/pkg/utils"
 	"errors"
+	"gorm.io/gorm"
 )
 
-func GetOrCreate(user *models.User, limit int, daysMultiplier int) (*models.Subscription, error) {
+func getDBConnection() (*gorm.DB, error) {
 	db, err := utils.GetDatabaseConnection()
 	if err != nil {
 		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
 	}
+	return db, nil
+}
+
+func getSubscription(user *models.User, db *gorm.DB) (*models.Subscription, error) {
+	subscription, err := subscriptionRepository.GetUserSubscription(user, db)
+	if err != nil {
+		return nil, err
+	}
+	return subscription, nil
+}
+
+func GetOrCreate(user *models.User, limit int, daysMultiplier int) (*models.Subscription, error) {
+	db, err := getDBConnection()
+	if err != nil {
+		return nil, err
+	}
 
 	var subscription *models.Subscription
 
-	subscription, err = subscriptionRepository.GetUserSubscription(user, db)
+	subscription, err = getSubscription(user, db)
 	if err != nil {
 		return nil, err
 	}
@@ -36,18 +53,15 @@ func GetOrCreate(user *models.User, limit int, daysMultiplier int) (*models.Subs
 }
 
 func GetUserSubscriptionWithNoPlanLimit(user *models.User) (*models.Subscription, error) {
-	db, err := utils.GetDatabaseConnection()
-	if err != nil {
-		return nil, errors.New("error occurred while getting a DB connection from the connection pool")
-	}
-
-	subscription, err := subscriptionRepository.GetUserSubscription(user, db)
+	db, err := getDBConnection()
 	if err != nil {
 		return nil, err
 	}
 
+	subscription, _ := getSubscription(user, db)
 	if subscription == nil {
 		subscription = &models.Subscription{Limit: consts.NoPlanLimit}
+
 		return subscription, nil
 	}
 

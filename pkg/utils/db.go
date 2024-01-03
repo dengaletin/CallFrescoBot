@@ -74,6 +74,12 @@ func AutoMigrateDB() error {
 		return connErr
 	}
 
-	err := db.AutoMigrate(&models.User{}, &models.Message{}, &models.Subscription{}, &models.UserRef{})
+	err := db.AutoMigrate(
+		&models.User{},
+		&models.Message{},
+		&models.Subscription{},
+		&models.UserRef{},
+	)
+
 	return err
 }
