@@ -6,43 +6,75 @@ import (
 	"regexp"
 )
 
-type Factory interface {
-	RunCommand() ICommand
+const (
+	StartCommandPattern  = `^/start ref[0-9]+$`
+	ModeCommandPattern   = `^/mode[0-9]$`
+	DialogCommandPattern = `^/dialog[0-9]$`
+)
+
+type CommandRegistryEntry struct {
+	Pattern   *regexp.Regexp
+	Generator func(update tgbotapi.Update, user *models.User) ICommand
 }
 
-func GetCommand(cmd tgbotapi.Update, user *models.User) ICommand {
-	re := regexp.MustCompile(`^/start ref[0-9]+$`)
-	match := re.FindStringSubmatch(cmd.Message.Text)
-	if len(match) != 0 {
-		return RefCommand{Update: cmd, User: user}
-	}
+var commandRegistry = []CommandRegistryEntry{
+	{Pattern: regexp.MustCompile(StartCommandPattern), Generator: NewRefCommand},
+	{Pattern: regexp.MustCompile(ModeCommandPattern), Generator: NewModeCommand},
+	{Pattern: regexp.MustCompile(DialogCommandPattern), Generator: NewDialogCommand},
+}
 
-	reMode := regexp.MustCompile(`^/mode[0-9]$`)
-	matchMode := reMode.FindStringSubmatch(cmd.Message.Text)
-	if len(matchMode) != 0 {
-		return ModeCommand{Update: cmd, User: user}
-	}
+func NewRefCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return RefCommand{BaseCommand{Update: update, User: user}}
+}
 
-	reDialog := regexp.MustCompile(`^/dialog[0-9]$`)
-	matchDialog := reDialog.FindStringSubmatch(cmd.Message.Text)
-	if len(matchDialog) != 0 {
-		return DialogCommand{Update: cmd, User: user}
-	}
+func NewStatusCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return StatusCommand{BaseCommand{Update: update, User: user}}
+}
 
-	switch cmd.Message.Text {
-	default:
-		if user.Mode != 0 {
-			return DalleCommand{Update: cmd, User: user}
+func NewModeCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return ModeCommand{BaseCommand{Update: update, User: user}}
+}
+
+func NewDialogCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return DialogCommand{BaseCommand{Update: update, User: user}}
+}
+
+func NewInviteCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return InviteCommand{BaseCommand{Update: update, User: user}}
+}
+
+func NewBuyCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return BuyCommand{BaseCommand{Update: update, User: user}}
+}
+
+func NewDalleCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return DalleCommand{BaseCommand{Update: update, User: user}}
+}
+
+func NewGptCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return GptCommand{BaseCommand{Update: update, User: user}}
+}
+
+func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
+	for _, entry := range commandRegistry {
+		if entry.Pattern.MatchString(update.Message.Text) {
+			return entry.Generator(update, user)
 		}
+	}
 
-		return GptCommand{Update: cmd, User: user}
-	case Start:
-		return StartCommand{Update: cmd, User: user}
-	case Status:
-		return StatusCommand{Update: cmd, User: user}
-	case Invite:
-		return InviteCommand{Update: cmd, User: user}
-	case Buy:
-		return BuyCommand{Update: cmd, User: user}
+	switch update.Message.Text {
+	case "/start":
+		return NewRefCommand(update, user)
+	case "/status":
+		return NewStatusCommand(update, user)
+	case "/invite":
+		return NewInviteCommand(update, user)
+	case "/buy":
+		return NewBuyCommand(update, user)
+	default:
+		if user.Mode == 1 {
+			return NewDalleCommand(update, user)
+		}
+		return NewGptCommand(update, user)
 	}
 }

@@ -2,8 +2,6 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
-	"CallFrescoBot/pkg/models"
-	messageService "CallFrescoBot/pkg/service/message"
 	userService "CallFrescoBot/pkg/service/user"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -12,40 +10,42 @@ import (
 )
 
 type ModeCommand struct {
-	Update tg.Update
-	User   *models.User
-}
-
-func (cmd ModeCommand) Common() (string, error) {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
-	if err != nil {
-		return messageValidatorText, err
-	}
-
-	return "", nil
+	BaseCommand
 }
 
 func (cmd ModeCommand) RunCommand() (tg.Chattable, error) {
-	result, err := cmd.Common()
+	result, err := cmd.Common(false)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	mode := strings.TrimPrefix(cmd.Update.Message.Text, "/mode")
-	id, err := strconv.ParseInt(mode, 10, 64)
-	if err != nil {
-		return nil, err
+	modeID, idErr := getModeIDFromCommand(cmd.Update.Message.Text)
+	if idErr != nil {
+		return createErrorMessage(cmd.Update.Message.Chat.ID), idErr
 	}
 
-	err = userService.SetMode(id, cmd.User)
-	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
+	updateErr := userService.SetMode(modeID, cmd.User)
+	if updateErr != nil {
+		return createErrorMessage(cmd.Update.Message.Chat.ID), updateErr
 	}
 
-	modeName, err := userService.GetMode(id)
-	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
+	modeName, modeErr := userService.GetMode(modeID)
+	if modeErr != nil {
+		return createErrorMessage(cmd.Update.Message.Chat.ID), modeErr
 	}
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, fmt.Sprintf(consts.ModeSuccess, modeName)), nil
+	return createSuccessMessage(cmd.Update.Message.Chat.ID, modeName), nil
+}
+
+func getModeIDFromCommand(commandText string) (int64, error) {
+	mode := strings.TrimPrefix(commandText, "/mode")
+	return strconv.ParseInt(mode, 10, 64)
+}
+
+func createErrorMessage(chatID int64) tg.MessageConfig {
+	return tg.NewMessage(chatID, consts.ErrorMsg)
+}
+
+func createSuccessMessage(chatID int64, modeName string) tg.MessageConfig {
+	return tg.NewMessage(chatID, fmt.Sprintf(consts.ModeSuccess, modeName))
 }

@@ -2,8 +2,6 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
-	"CallFrescoBot/pkg/models"
-	messageService "CallFrescoBot/pkg/service/message"
 	userService "CallFrescoBot/pkg/service/user"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -12,40 +10,39 @@ import (
 )
 
 type DialogCommand struct {
-	Update tg.Update
-	User   *models.User
-}
-
-func (cmd DialogCommand) Common() (string, error) {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
-	if err != nil {
-		return messageValidatorText, err
-	}
-
-	return "", nil
+	BaseCommand
 }
 
 func (cmd DialogCommand) RunCommand() (tg.Chattable, error) {
-	result, err := cmd.Common()
+	result, err := cmd.Common(false)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	dialog := strings.TrimPrefix(cmd.Update.Message.Text, "/dialog")
-	id, err := strconv.ParseInt(dialog, 10, 64)
+	id, err := extractDialogID(cmd.Update.Message.Text)
 	if err != nil {
 		return nil, err
 	}
 
 	err = userService.SetDialogStatus(id, cmd.User)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
+		return cmd.newErrorMessage(), err
 	}
 
 	dialogStatus, err := userService.GetDialogStatus(id)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
+		return cmd.newErrorMessage(), err
 	}
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, fmt.Sprintf(consts.DialogSuccess, dialogStatus)), nil
+	successMsg := fmt.Sprintf(consts.DialogSuccess, dialogStatus)
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, successMsg), nil
+}
+
+func extractDialogID(messageText string) (int64, error) {
+	dialog := strings.TrimPrefix(messageText, "/dialog")
+	return strconv.ParseInt(dialog, 10, 64)
+}
+
+func (cmd DialogCommand) newErrorMessage() tg.Chattable {
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg)
 }

@@ -2,8 +2,6 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
-	"CallFrescoBot/pkg/models"
-	messageService "CallFrescoBot/pkg/service/message"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	userRefService "CallFrescoBot/pkg/service/userRef"
@@ -14,54 +12,49 @@ import (
 )
 
 type RefCommand struct {
-	Update tg.Update
-	User   *models.User
-}
-
-func (cmd RefCommand) Common() (string, error) {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
-	if err != nil {
-		return messageValidatorText, err
-	}
-
-	return "", nil
+	BaseCommand
 }
 
 func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
-	result, err := cmd.Common()
+	result, err := cmd.Common(false)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return newMessage(cmd.Update, result), err
 	}
 
-	message := strings.TrimPrefix(cmd.Update.Message.Text, "/start ref")
-
-	id, err := strconv.ParseInt(message, 10, 64)
+	refID, err := parseReferralID(cmd.Update.Message.Text)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
+		return newMessage(cmd.Update, consts.StartMsg), err
 	}
 
-	if id == cmd.User.TgId {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), errors.New("the user is trying to invite himself")
+	if refID == cmd.User.TgId {
+		return newMessage(cmd.Update, consts.StartMsg), errors.New("cannot refer self")
 	}
 
 	if !cmd.User.IsNew {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), errors.New("the user is not new")
+		return newMessage(cmd.Update, consts.StartMsg), errors.New("user is not new")
 	}
 
-	user, err := userService.GerUserByTgId(id)
+	referringUser, err := userService.GerUserByTgId(refID)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
+		return newMessage(cmd.Update, consts.StartMsg), err
 	}
 
-	_, err = userRefService.Create(user, cmd.User)
-	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
+	if _, err = userRefService.Create(referringUser, cmd.User); err != nil {
+		return newMessage(cmd.Update, consts.StartMsg), err
 	}
 
-	_, err = subscriptionService.GetOrCreate(user, 25, consts.RefDaysMultiplier)
-	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), err
+	if _, err = subscriptionService.GetOrCreate(referringUser, 25, consts.RefDaysMultiplier); err != nil {
+		return newMessage(cmd.Update, consts.StartMsg), err
 	}
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), nil
+	return newMessage(cmd.Update, consts.StartMsg), nil
+}
+
+func newMessage(update tg.Update, text string) tg.Chattable {
+	return tg.NewMessage(update.Message.Chat.ID, text)
+}
+
+func parseReferralID(messageText string) (int64, error) {
+	message := strings.TrimPrefix(messageText, "/start ref")
+	return strconv.ParseInt(strings.TrimSpace(message), 10, 64)
 }

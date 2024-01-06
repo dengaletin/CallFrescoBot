@@ -11,21 +11,11 @@ import (
 )
 
 type StatusCommand struct {
-	Update tg.Update
-	User   *models.User
-}
-
-func (cmd StatusCommand) Common() (string, error) {
-	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)
-	if err != nil {
-		return messageValidatorText, err
-	}
-
-	return "", nil
+	BaseCommand
 }
 
 func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
-	result, err := cmd.Common()
+	result, err := cmd.Common(false)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
