@@ -23,6 +23,10 @@ var commandRegistry = []CommandRegistryEntry{
 	{Pattern: regexp.MustCompile(DialogCommandPattern), Generator: NewDialogCommand},
 }
 
+func NewStartCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return StartCommand{BaseCommand{Update: update, User: user}}
+}
+
 func NewRefCommand(update tgbotapi.Update, user *models.User) ICommand {
 	return RefCommand{BaseCommand{Update: update, User: user}}
 }
@@ -64,7 +68,7 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 
 	switch update.Message.Text {
 	case "/start":
-		return NewRefCommand(update, user)
+		return NewStartCommand(update, user)
 	case "/status":
 		return NewStatusCommand(update, user)
 	case "/invite":

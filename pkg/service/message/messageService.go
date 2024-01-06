@@ -6,7 +6,6 @@ import (
 	messageRepository "CallFrescoBot/pkg/repositories/message"
 	"CallFrescoBot/pkg/utils"
 	"errors"
-	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 	"time"
@@ -60,12 +59,11 @@ func GetMessagesByUser(user *models.User, limit int) ([]models.Message, error) {
 	return messageRepository.GetMessagesByUser(user, limit, db)
 }
 
-func SendErrorToUser(msgInfo string, err error) error {
-	info := fmt.Sprintf("❌❌❌ Error: [%s] %s", msgInfo, err.Error())
-	message := tg.NewMessage(6298977100, info)
+func SendMsgToUser(chatId int64, msgInfo string) error {
+	message := tg.NewMessage(chatId, msgInfo)
 	bot := utils.GetBot()
 
-	_, err = bot.Send(message)
+	_, err := bot.Send(message)
 	if err != nil {
 		return err
 	}

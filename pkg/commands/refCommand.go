@@ -2,6 +2,7 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
+	messageService "CallFrescoBot/pkg/service/message"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	userRefService "CallFrescoBot/pkg/service/userRef"
@@ -44,6 +45,11 @@ func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
 	}
 
 	if _, err = subscriptionService.GetOrCreate(referringUser, 25, consts.RefDaysMultiplier); err != nil {
+		return newMessage(cmd.Update, consts.StartMsg), err
+	}
+
+	err = messageService.SendMsgToUser(referringUser.TgId, consts.SuccessRef)
+	if err != nil {
 		return newMessage(cmd.Update, consts.StartMsg), err
 	}
 
