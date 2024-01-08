@@ -51,6 +51,10 @@ func NewBuyCommand(update tgbotapi.Update, user *models.User) ICommand {
 	return BuyCommand{BaseCommand{Update: update, User: user}}
 }
 
+func NewForgetCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return ForgetCommand{BaseCommand{Update: update, User: user}}
+}
+
 func NewDalleCommand(update tgbotapi.Update, user *models.User) ICommand {
 	return DalleCommand{BaseCommand{Update: update, User: user}}
 }
@@ -75,6 +79,8 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 		return NewInviteCommand(update, user)
 	case "/buy":
 		return NewBuyCommand(update, user)
+	case "/forget":
+		return NewForgetCommand(update, user)
 	default:
 		if user.Mode == 1 {
 			return NewDalleCommand(update, user)

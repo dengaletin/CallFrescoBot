@@ -87,3 +87,13 @@ func GetDialogStatus(dialogStatus int64) (string, error) {
 		return "", errors.New("UNKNOWN")
 	}
 }
+
+func SetDialogFromId(messageId uint64, user *models.User, db *gorm.DB) error {
+	result := db.Model(&user).Update("dialog_from_id", messageId)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

@@ -31,13 +31,13 @@ func dbConnection() (*gorm.DB, error) {
 	return db, nil
 }
 
-func CreateMessage(userId uint64, message string, response string) error {
+func CreateMessage(userId uint64, message string, response string, mode int64) error {
 	db, err := dbConnection()
 	if err != nil {
 		return err
 	}
 
-	_, err = messageRepository.MessageCreate(userId, message, response, db)
+	_, err = messageRepository.MessageCreate(userId, message, response, mode, db)
 	return err
 }
 
@@ -50,13 +50,13 @@ func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time) (i
 	return messageRepository.CountMessagesByUserAndDate(user, limit, date, db)
 }
 
-func GetMessagesByUser(user *models.User, limit int) ([]models.Message, error) {
+func GetMessagesByUser(user *models.User, limit int, mode int64) ([]models.Message, error) {
 	db, err := dbConnection()
 	if err != nil {
 		return nil, err
 	}
 
-	return messageRepository.GetMessagesByUser(user, limit, db)
+	return messageRepository.GetMessagesByUser(user, limit, mode, db)
 }
 
 func SendMsgToUser(chatId int64, msgInfo string) error {

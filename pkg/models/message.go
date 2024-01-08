@@ -8,5 +8,6 @@ type Message struct {
 	User      User
 	Message   string    `gorm:"not null"`
 	Response  string    `gorm:"not null"`
+	Mode      int64     `gorm:"not null;default:0"`
 	CreatedAt time.Time `gorm:"autoCreateTime:milli;index:idx_user_id__created_at"`
 }

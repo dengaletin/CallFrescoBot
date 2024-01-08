@@ -27,4 +27,5 @@ const (
 	RunOutOfMessages         = "🦄 Sorry, you ran out of messages\n\n💬 Contact: \n@dendefoe\n\n💚 Invite your friend and get a free \"Basic\" plan for a week. To get a referral link, use the command /invite\n\n💸 Buy subscription: /buy"
 	InviteLink               = "💚 Share with your friend and get the 🤓 Basic Plan for a week: \n🔗 https://t.me/call_fresco_bot?start=ref%d"
 	SuccessRef               = "Congratulations! 🎉 Your referral was successful, and a new user has joined through your link! As a token of our appreciation, we have activated your bonus subscription. 🎁 Enjoy the extended features and thank you for spreading the word! 👍 If you have any questions, feel free to ask. Happy chatting! 🤖💬"
+	Forget                   = "The bot successfully forgot the context of the dialogue 😅🤖💭✨"
 )

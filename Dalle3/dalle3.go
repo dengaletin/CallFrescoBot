@@ -11,6 +11,8 @@ import (
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
+	"log"
+	"strings"
 )
 
 var apiKey = utils.GetEnvVar("GPT_API_KEY")
@@ -26,7 +28,7 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 func getImageResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	c := openai.NewClient(apiKey)
 	ctx := context.Background()
-	imgBytes, err := getImageBytes(ctx, c, update)
+	imgBytes, err := getImageBytes(ctx, c, update, user)
 
 	if err != nil {
 		return nil, err
@@ -35,8 +37,13 @@ func getImageResponse(update tg.Update, user *models.User) (tg.Chattable, error)
 	return getMessage(update, imgBytes, user.Id)
 }
 
-func getImageBytes(ctx context.Context, openaiClient *openai.Client, update tg.Update) ([]byte, error) {
-	reqBase64 := prepareRequest(update.Message.Text)
+func getImageBytes(
+	ctx context.Context,
+	openaiClient *openai.Client,
+	update tg.Update,
+	user *models.User,
+) ([]byte, error) {
+	reqBase64 := prepareRequest(update.Message.Text, user)
 	respBase64, err := openaiClient.CreateImage(ctx, reqBase64)
 
 	if err != nil {
@@ -47,7 +54,24 @@ func getImageBytes(ctx context.Context, openaiClient *openai.Client, update tg.U
 	return base64.StdEncoding.DecodeString(respBase64.Data[0].B64JSON)
 }
 
-func prepareRequest(promptText string) openai.ImageRequest {
+func prepareRequest(promptText string, user *models.User) openai.ImageRequest {
+	var messages []string
+
+	if user.Dialog == 1 {
+		userMessages, err := messageService.GetMessagesByUser(user, 15, 1)
+		if err != nil {
+			log.Printf("error getting messages by user: %v", err)
+		} else {
+			for _, userMessage := range userMessages {
+				messages = append(messages, userMessage.Message)
+			}
+		}
+	}
+
+	if len(messages) > 0 {
+		promptText = strings.Join(messages, "\n") + "\n" + promptText
+	}
+
 	return openai.ImageRequest{
 		Model:          openai.CreateImageModelDallE3,
 		Prompt:         promptText,
@@ -59,7 +83,7 @@ func prepareRequest(promptText string) openai.ImageRequest {
 
 func getMessage(update tg.Update, imgBytes []byte, userID uint64) (tg.Chattable, error) {
 	file := createFile("image.jpg", imgBytes)
-	err := messageService.CreateMessage(userID, update.Message.Text, "image.jpg")
+	err := messageService.CreateMessage(userID, update.Message.Text, "image.jpg", 1)
 
 	if err != nil {
 		return nil, err

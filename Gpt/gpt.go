@@ -22,7 +22,7 @@ func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest)
 }
 
 func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompletionResponse) (tg.Chattable, error) {
-	err := messageService.CreateMessage(user.Id, update.Message.Text, res.Choices[0].Message.Content)
+	err := messageService.CreateMessage(user.Id, update.Message.Text, res.Choices[0].Message.Content, 0)
 	if err != nil {
 		return nil, fmt.Errorf("error creating message: %w", err)
 	}
@@ -54,7 +54,7 @@ func createRequest(user *models.User, update tg.Update) openai.ChatCompletionReq
 	var messages []openai.ChatCompletionMessage
 
 	if user.Dialog == 1 {
-		userMessages, err := messageService.GetMessagesByUser(user, 15)
+		userMessages, err := messageService.GetMessagesByUser(user, 15, 0)
 		if err != nil {
 			log.Printf("error getting messages by user: %v", err)
 		}

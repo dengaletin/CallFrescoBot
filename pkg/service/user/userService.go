@@ -86,3 +86,17 @@ func GetMode(mode int64) (string, error) {
 func GetDialogStatus(dialogStatus int64) (string, error) {
 	return userRepository.GetDialogStatus(dialogStatus)
 }
+
+func SetUserDialogFromId(user *models.User) error {
+	db, err := dbConnection()
+	if err != nil {
+		return err
+	}
+
+	message, err := messageRepository.GetUserLastMessage(user, db)
+	if err != nil {
+		return err
+	}
+
+	return userRepository.SetDialogFromId(message.Id, user, db)
+}
