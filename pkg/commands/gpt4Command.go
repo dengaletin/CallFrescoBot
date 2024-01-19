@@ -8,17 +8,17 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-type GptCommand struct {
+type Gpt4Command struct {
 	BaseCommand
 }
 
-func (cmd GptCommand) RunCommand() (tg.Chattable, error) {
+func (cmd Gpt4Command) RunCommand() (tg.Chattable, error) {
 	result, err := cmd.Common(true)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	gptResponse, err := gpt.GetResponse(cmd.Update, cmd.User, openai.GPT3Dot5Turbo)
+	gptResponse, err := gpt.GetResponse(cmd.Update, cmd.User, openai.GPT4TurboPreview)
 	if err != nil {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg)), err
 	}

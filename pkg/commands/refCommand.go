@@ -6,6 +6,7 @@ import (
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	userRefService "CallFrescoBot/pkg/service/userRef"
+	"CallFrescoBot/pkg/utils"
 	"errors"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"strconv"
@@ -24,36 +25,36 @@ func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
 
 	refID, err := parseReferralID(cmd.Update.Message.Text)
 	if err != nil {
-		return newMessage(cmd.Update, consts.StartMsg), err
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
 	}
 
 	if refID == cmd.User.TgId {
-		return newMessage(cmd.Update, consts.StartMsg), errors.New("cannot refer self")
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), errors.New("cannot refer self")
 	}
 
 	if !cmd.User.IsNew {
-		return newMessage(cmd.Update, consts.StartMsg), errors.New("user is not new")
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), errors.New("user is not new")
 	}
 
 	referringUser, err := userService.GerUserByTgId(refID)
 	if err != nil {
-		return newMessage(cmd.Update, consts.StartMsg), err
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
 	}
 
 	if _, err = userRefService.Create(referringUser, cmd.User); err != nil {
-		return newMessage(cmd.Update, consts.StartMsg), err
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
 	}
 
-	if _, err = subscriptionService.GetOrCreate(referringUser, 25, consts.RefDaysMultiplier); err != nil {
-		return newMessage(cmd.Update, consts.StartMsg), err
+	if _, err = subscriptionService.GetOrCreate(referringUser, 10, consts.RefDaysMultiplier); err != nil {
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
 	}
 
-	err = messageService.SendMsgToUser(referringUser.TgId, consts.SuccessRef)
+	err = messageService.SendMsgToUser(referringUser.TgId, utils.LocalizeSafe(consts.SuccessRef))
 	if err != nil {
-		return newMessage(cmd.Update, consts.StartMsg), err
+		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
 	}
 
-	return newMessage(cmd.Update, consts.StartMsg), nil
+	return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), nil
 }
 
 func newMessage(update tg.Update, text string) tg.Chattable {

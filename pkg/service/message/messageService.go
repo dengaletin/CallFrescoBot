@@ -11,12 +11,24 @@ import (
 	"time"
 )
 
+func ParseUpdate(update tg.Update) (*tg.Message, *tg.User, error) {
+	if update.Message != nil {
+		return update.Message, update.Message.From, nil
+	}
+
+	if update.CallbackQuery != nil {
+		return update.CallbackQuery.Message, update.CallbackQuery.From, nil
+	}
+
+	return nil, nil, errors.New("can't parse message")
+}
+
 func ValidateMessage(cmd string) (string, error) {
 	if cmd == "" {
-		return consts.UnsupportedMessageType, errors.New(consts.UnsupportedMessageType)
+		return utils.LocalizeSafe(consts.UnsupportedMessageType), errors.New("unsupported message type")
 	}
 	if len([]rune(cmd)) < 4 {
-		return consts.MessageIsTooShort, errors.New(consts.MessageIsTooShort)
+		return utils.LocalizeSafe(consts.MessageIsTooShort), errors.New("message is too short")
 	}
 
 	return cmd, nil

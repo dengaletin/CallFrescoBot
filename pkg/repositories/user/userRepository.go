@@ -1,7 +1,9 @@
 package userRepository
 
 import (
+	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
+	"CallFrescoBot/pkg/utils"
 	"errors"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/exp/slices"
@@ -33,7 +35,7 @@ func GerUserByTgId(tdId int64, db *gorm.DB) (*models.User, error) {
 }
 
 func SetMode(mode int64, user *models.User, db *gorm.DB) error {
-	modes := []int64{0, 1}
+	modes := []int64{0, 1, 2}
 	modeStatus := slices.Contains(modes, mode)
 
 	if modeStatus == false {
@@ -41,6 +43,23 @@ func SetMode(mode int64, user *models.User, db *gorm.DB) error {
 	}
 
 	result := db.Model(&user).Update("mode", mode)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func SetLanguage(language int64, user *models.User, db *gorm.DB) error {
+	languages := []int64{1, 2}
+	languageStatus := slices.Contains(languages, language)
+
+	if languageStatus == false {
+		return errors.New("incorrect language")
+	}
+
+	result := db.Model(&user).Update("lang", language)
 
 	if result.Error != nil {
 		return result.Error
@@ -69,22 +88,13 @@ func SetDialogStatus(dialogStatus int64, user *models.User, db *gorm.DB) error {
 func GetMode(mode int64) (string, error) {
 	switch mode {
 	case 0:
-		return "ChatGpt", nil
+		return utils.LocalizeSafe(consts.ModeGpt35), nil
 	case 1:
-		return "Dalle3", nil
+		return utils.LocalizeSafe(consts.ModeDalle3), nil
+	case 2:
+		return utils.LocalizeSafe(consts.ModeGpt4), nil
 	default:
 		return "", errors.New("unknown mode")
-	}
-}
-
-func GetDialogStatus(dialogStatus int64) (string, error) {
-	switch dialogStatus {
-	case 0:
-		return "OFF", nil
-	case 1:
-		return "ON", nil
-	default:
-		return "", errors.New("UNKNOWN")
 	}
 }
 

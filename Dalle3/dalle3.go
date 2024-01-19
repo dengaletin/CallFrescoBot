@@ -19,7 +19,7 @@ var apiKey = utils.GetEnvVar("GPT_API_KEY")
 
 func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	if apiKey == "" {
-		return nil, errors.New(consts.MissingGptKey)
+		return nil, errors.New(consts.ErrorMissingGptKey)
 	}
 
 	return getImageResponse(update, user)
@@ -75,7 +75,7 @@ func prepareRequest(promptText string, user *models.User) openai.ImageRequest {
 	return openai.ImageRequest{
 		Model:          openai.CreateImageModelDallE3,
 		Prompt:         promptText,
-		Size:           openai.CreateImageSize1792x1024,
+		Size:           openai.CreateImageSize1024x1024,
 		ResponseFormat: openai.CreateImageResponseFormatB64JSON,
 		N:              1,
 	}

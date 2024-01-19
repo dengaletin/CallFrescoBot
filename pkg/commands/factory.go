@@ -7,9 +7,8 @@ import (
 )
 
 const (
-	StartCommandPattern  = `^/start ref[0-9]+$`
-	ModeCommandPattern   = `^/mode[0-9]$`
-	DialogCommandPattern = `^/dialog[0-9]$`
+	StartCommandPattern = `^/start ref[0-9]+$`
+	ModeCommandPattern  = `^/mode[0-9]$`
 )
 
 type CommandRegistryEntry struct {
@@ -20,7 +19,10 @@ type CommandRegistryEntry struct {
 var commandRegistry = []CommandRegistryEntry{
 	{Pattern: regexp.MustCompile(StartCommandPattern), Generator: NewRefCommand},
 	{Pattern: regexp.MustCompile(ModeCommandPattern), Generator: NewModeCommand},
-	{Pattern: regexp.MustCompile(DialogCommandPattern), Generator: NewDialogCommand},
+}
+
+func NewModeCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return ModeCommand{BaseCommand{Update: update, User: user}}
 }
 
 func NewStartCommand(update tgbotapi.Update, user *models.User) ICommand {
@@ -35,12 +37,8 @@ func NewStatusCommand(update tgbotapi.Update, user *models.User) ICommand {
 	return StatusCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewModeCommand(update tgbotapi.Update, user *models.User) ICommand {
-	return ModeCommand{BaseCommand{Update: update, User: user}}
-}
-
-func NewDialogCommand(update tgbotapi.Update, user *models.User) ICommand {
-	return DialogCommand{BaseCommand{Update: update, User: user}}
+func NewSettingsCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return SettingsCommand{BaseCommand{Update: update, User: user}}
 }
 
 func NewInviteCommand(update tgbotapi.Update, user *models.User) ICommand {
@@ -63,6 +61,10 @@ func NewGptCommand(update tgbotapi.Update, user *models.User) ICommand {
 	return GptCommand{BaseCommand{Update: update, User: user}}
 }
 
+func NewGpt4Command(update tgbotapi.Update, user *models.User) ICommand {
+	return Gpt4Command{BaseCommand{Update: update, User: user}}
+}
+
 func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 	for _, entry := range commandRegistry {
 		if entry.Pattern.MatchString(update.Message.Text) {
@@ -81,9 +83,14 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 		return NewBuyCommand(update, user)
 	case "/forget":
 		return NewForgetCommand(update, user)
+	case "/settings":
+		return NewSettingsCommand(update, user)
 	default:
 		if user.Mode == 1 {
 			return NewDalleCommand(update, user)
+		}
+		if user.Mode == 2 {
+			return NewGpt4Command(update, user)
 		}
 		return NewGptCommand(update, user)
 	}

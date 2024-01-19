@@ -5,6 +5,7 @@ import (
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
+	"CallFrescoBot/pkg/utils"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"time"
@@ -34,7 +35,7 @@ func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
 	remainingMessages := RemainingMessages(int64(subscription.Limit), messagesCount)
 	validDue := SubscriptionValidDue(subscription)
 
-	status := fmt.Sprintf(consts.StatusMsg, subscriptionName, subscription.Limit, remainingMessages, validDue)
+	status := fmt.Sprintf(utils.LocalizeSafe(consts.StatusMsg), subscriptionName, subscription.Limit, remainingMessages, validDue)
 
 	return tg.NewMessage(cmd.Update.Message.Chat.ID, status), nil
 }
@@ -51,17 +52,17 @@ func RemainingMessages(subscriptionLimit int64, messagesCount int64) int64 {
 func ResolveSubscriptionName(limit int) string {
 	switch limit := limit; {
 	case limit == 0:
-		return consts.SubscriptionPlanHacker
+		return utils.LocalizeSafe(consts.SubscriptionPlanHacker)
 	case limit <= 5:
-		return consts.SubscriptionPlanHomeless
-	case limit <= 25:
-		return consts.SubscriptionPlanBasic
+		return utils.LocalizeSafe(consts.SubscriptionPlanFree)
+	case limit <= 10:
+		return utils.LocalizeSafe(consts.SubscriptionPlanStart)
+	case limit <= 20:
+		return utils.LocalizeSafe(consts.SubscriptionPlanPro)
 	case limit <= 50:
-		return consts.SubscriptionPlanVIP
-	case limit <= 100:
-		return consts.SubscriptionPlanDeluxe
+		return utils.LocalizeSafe(consts.SubscriptionPlanBoss)
 	default:
-		return consts.SubscriptionPlanHacker
+		return utils.LocalizeSafe(consts.SubscriptionPlanHacker)
 	}
 }
 

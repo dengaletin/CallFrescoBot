@@ -34,13 +34,13 @@ func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompl
 	return message, nil
 }
 
-func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
+func GetResponse(update tg.Update, user *models.User, model string) (tg.Chattable, error) {
 	if utils.GetEnvVar("GPT_API_KEY") == "" {
-		return nil, errors.New(consts.MissingGptKey)
+		return nil, errors.New(consts.ErrorMissingGptKey)
 	}
 
 	client := openai.NewClient(utils.GetEnvVar("GPT_API_KEY"))
-	request := createRequest(user, update)
+	request := createRequest(user, update, model)
 
 	resp, err := getResponseFromGPT(client, request)
 	if err != nil {
@@ -50,7 +50,7 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	return handleGptResponse(update, user, resp)
 }
 
-func createRequest(user *models.User, update tg.Update) openai.ChatCompletionRequest {
+func createRequest(user *models.User, update tg.Update, model string) openai.ChatCompletionRequest {
 	var messages []openai.ChatCompletionMessage
 
 	if user.Dialog == 1 {
@@ -76,7 +76,7 @@ func createRequest(user *models.User, update tg.Update) openai.ChatCompletionReq
 	})
 
 	return openai.ChatCompletionRequest{
-		Model:    openai.GPT4TurboPreview,
+		Model:    model,
 		Messages: messages,
 	}
 }

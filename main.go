@@ -4,7 +4,9 @@ import (
 	"CallFrescoBot/app"
 	"CallFrescoBot/pkg/commands"
 	"CallFrescoBot/pkg/consts"
+	callbackService "CallFrescoBot/pkg/service/callback"
 	messageService "CallFrescoBot/pkg/service/message"
+	"CallFrescoBot/pkg/service/numericKeyboard"
 	userService "CallFrescoBot/pkg/service/user"
 	"CallFrescoBot/pkg/utils"
 	"fmt"
@@ -30,16 +32,46 @@ func processUpdates(updates tg.UpdatesChannel) {
 	bot := utils.GetBot()
 
 	for update := range updates {
-		if update.Message == nil {
+		if update.Message == nil && update.CallbackQuery == nil {
 			continue
 		}
 
-		messageInfo := formatMessageInfo(update)
+		message, from, messageServiceErr := messageService.ParseUpdate(update)
+		if messageServiceErr != nil {
+			logAndNotify("", messageServiceErr)
+		}
+
+		messageInfo := formatMessageInfo(message)
 		log.Printf(messageInfo)
 
-		user, userServiceErr := userService.GetOrCreate(update)
+		user, userServiceErr := userService.GetOrCreate(from)
 		if userServiceErr != nil {
 			logAndNotify(messageInfo, userServiceErr)
+		}
+
+		locErr := utils.CreateLoc(user)
+		if locErr != nil {
+			log.Printf(locErr.Error())
+			logAndNotify(messageInfo, locErr)
+		}
+
+		mainMenuErr := numericKeyboard.CreateMainMenu()
+		if mainMenuErr != nil {
+			log.Printf(mainMenuErr.Error())
+			logAndNotify(messageInfo, mainMenuErr)
+		}
+
+		if update.CallbackQuery != nil {
+			fmt.Println(update.CallbackQuery.Data)
+			callbackErr := callbackService.ResolveAndHandle(update.CallbackQuery, user, bot)
+			if callbackErr != nil {
+				log.Printf(callbackErr.Error())
+				logAndNotify(messageInfo, callbackErr)
+			}
+		}
+
+		if update.Message == nil {
+			continue
 		}
 
 		response, commandErr := commands.GetCommand(update, user).RunCommand()
@@ -49,16 +81,17 @@ func processUpdates(updates tg.UpdatesChannel) {
 
 		if err := sendBotResponse(bot, response); err != nil {
 			log.Printf(err.Error())
+			logAndNotify(messageInfo, err)
 		}
 	}
 }
 
-func formatMessageInfo(update tg.Update) string {
+func formatMessageInfo(message *tg.Message) string {
 	return fmt.Sprintf(
 		"[%s, %d] %s",
-		update.Message.From.UserName,
-		update.Message.Chat.ID,
-		update.Message.Text,
+		message.From.UserName,
+		message.Chat.ID,
+		message.Text,
 	)
 }
 

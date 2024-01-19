@@ -21,12 +21,13 @@ func dbConnection() (*gorm.DB, error) {
 	return db, nil
 }
 
-func GetOrCreate(cmd tgbotapi.Update) (*models.User, error) {
+func GetOrCreate(user *tgbotapi.User) (*models.User, error) {
 	db, err := dbConnection()
 	if err != nil {
 		return nil, err
 	}
-	return userRepository.FirstOrCreate(cmd.Message.From, db)
+
+	return userRepository.FirstOrCreate(user, db)
 }
 
 func ValidateUser(user *models.User) (string, error) {
@@ -49,7 +50,7 @@ func ValidateUser(user *models.User) (string, error) {
 	}
 
 	if messagesCount >= int64(subscription.Limit) {
-		return consts.RunOutOfMessages, errors.New("out of messages")
+		return utils.LocalizeSafe(consts.RunOutOfMessages), errors.New("out of messages")
 	}
 
 	return "", nil
@@ -71,6 +72,15 @@ func SetMode(mode int64, user *models.User) error {
 	return userRepository.SetMode(mode, user, db)
 }
 
+func SetLanguage(language int64, user *models.User) error {
+	db, err := dbConnection()
+	if err != nil {
+		return err
+	}
+
+	return userRepository.SetLanguage(language, user, db)
+}
+
 func SetDialogStatus(dialogStatus int64, user *models.User) error {
 	db, err := dbConnection()
 	if err != nil {
@@ -81,10 +91,6 @@ func SetDialogStatus(dialogStatus int64, user *models.User) error {
 
 func GetMode(mode int64) (string, error) {
 	return userRepository.GetMode(mode)
-}
-
-func GetDialogStatus(dialogStatus int64) (string, error) {
-	return userRepository.GetDialogStatus(dialogStatus)
 }
 
 func SetUserDialogFromId(user *models.User) error {

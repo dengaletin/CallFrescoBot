@@ -18,7 +18,7 @@ func init() {
 
 func CreateBot() error {
 	if apiKey == "" {
-		log.Fatalln(consts.MissingTgKey)
+		log.Fatalln(consts.ErrorMissingTgKey)
 	}
 
 	bot, err := tg.NewBotAPI(apiKey)

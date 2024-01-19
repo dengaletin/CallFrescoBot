@@ -3,6 +3,7 @@ package commands
 import (
 	"CallFrescoBot/Dalle3"
 	"CallFrescoBot/pkg/consts"
+	"CallFrescoBot/pkg/utils"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -19,7 +20,7 @@ func (cmd DalleCommand) RunCommand() (tg.Chattable, error) {
 	dalleResponse, err := Dalle3.GetResponse(cmd.Update, cmd.User)
 
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.ErrorMsg), err
+		return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg)), err
 	}
 
 	return dalleResponse, nil

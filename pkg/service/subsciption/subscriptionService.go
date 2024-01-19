@@ -17,6 +17,21 @@ func getDBConnection() (*gorm.DB, error) {
 	return db, nil
 }
 
+func GetUserSubscription(user *models.User) (*models.Subscription, error) {
+	db, err := getDBConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	subscription, err := getSubscription(user, db)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return subscription, nil
+}
+
 func getSubscription(user *models.User, db *gorm.DB) (*models.Subscription, error) {
 	subscription, err := subscriptionRepository.GetUserSubscription(user, db)
 	if err != nil {

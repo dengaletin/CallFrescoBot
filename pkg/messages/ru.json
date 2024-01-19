@@ -1,0 +1,126 @@
+[
+  {
+    "id": "StartMsg",
+    "translation": "Привет! \uD83D\uDC4B Это телеграм-бот FrescoAiBot для взаимодействия с языковой моделью ChatGPT, а также нейросетью для генерации изображений Dall-E \uD83E\uDD16\n\nВ моей бесплатной версии у Вас есть доступ к 5\uFE0F⃣ запросам в день (они обновляются каждые 24 часа). Увеличить число запросов можно с ежемесячной подпиской:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ запросов в день — 4,5$\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ запросов в день — 9,9$\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ запросов в день — 19,9$ \n\n\uD83D\uDCB8 Купить подписку /buy\n\n\uD83C\uDF81 Также я люблю делать подарки! Вы можете пригласить друга и получить подиску \"Start\" на 7 дней бесплатно. Чтобы получить реферальную ссылку, используйте команду /invite"
+  },
+  {
+    "id": "BuyMsg",
+    "translation": "\uD83D\uDCB8 Выбрать ежемесячную подписку:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ запросов в день — 4,5$\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ запросов в день — 9,9$\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ запросов в день — 19,9$\n\n\uD83D\uDCB8 Купить подписку:\nTether (USDT) TRC20: TBbdyory2Bc4csT5Xc4tieEHptD2XEKeRW"
+  },
+  {
+    "id": "ErrorMsg",
+    "translation": "❌ Что-то пошло не так. \uD83E\uDD15 Попробуйте позже"
+  },
+  {
+    "id": "StatusMsg",
+    "translation": "\uD83D\uDCCAИнформация о подписке\n\nВаша подписка: %s (%d запросов в день) \nДоступно: %d запросов\nДействительна до: %s\nКонтакт: @dendefoe\n\n\uD83C\uDF81 Пригласите друга и получите в подарок подписку \"Start\" на 7 дней бесплатно. Чтобы получить реферальную ссылку, используйте команду /invite\n\n\uD83D\uDCB8 Купить подписку: /buy"
+  },
+  {
+    "id": "UnsupportedMessageType",
+    "translation": "❌ Извините, отправленный вами тип сообщения на данный момент не поддерживается"
+  },
+  {
+    "id": "MessageIsTooShort",
+    "translation": "❌ Вы отправили слишком короткое сообщение. Минимальное количество символов — 4"
+  },
+  {
+    "id": "SubscriptionPlanFree",
+    "translation": "✅ Free"
+  },
+  {
+    "id": "SubscriptionPlanStart",
+    "translation": "✅ Start"
+  },
+  {
+    "id": "SubscriptionPlanPro",
+    "translation": "✅ Pro"
+  },
+  {
+    "id": "SubscriptionPlanBoss",
+    "translation": "✅ Boss"
+  },
+  {
+    "id": "SubscriptionPlanHacker",
+    "translation": "✅ Hacker"
+  },
+  {
+    "id": "SettingsMessage",
+    "translation": "⚙\uFE0F Настройки бота\n\nВ этом разделе Вы можете:\n\n✅ Выбрать язык интерфейса (английский/русский).\n\n\uD83E\uDD16 Выбрать режим ChatGPT для работы с текстовой информацией.\nFrescoAiBot прдлагает 2 версии:\n\n- GPT-3.5 — это усовершенствованная модель следующего поколения после GPT-3 (Generative Pre-trained Transformer 3), которая является одной из самых мощных моделей для генерации текста.\n\n- GPT-4 обладает большим числом параметров, чем GPT-3. У него улучшенны способности в понимании и генерации текстов, а также в задачах, требующих логического мышления и распознания контекста. \n\n\uD83C\uDFA8 Выбрать режим Dall-E 3 для генерации изображений.\n\n\uD83D\uDCAC Включить или выключить поддержку контекста (режим диалога). Когда контекст активирован, бот учитывает свой предыдущий ответ и дополняет его."
+  },
+  {
+    "id": "RunOutOfMessages",
+    "translation": "\uD83D\uDE25 Извините, у Вас закончились сообщения\n\nКонтакт: @dendefoe\n\n\uD83C\uDF81 Пригласите друга и получите в подарок подписку \"Start\" на 7 дней бесплатно. Чтобы получить реферальную ссылку, используйте команду /invite\n\uD83D\uDCB8 Купить подписку: /buy"
+  },
+  {
+    "id": "InviteLink",
+    "translation": "\uD83C\uDF81 Пригласить друга\n\nПригласите друга по ссылке и получите в подарок \"Start\" на 7 дней:\n\n `https://t.me/call_fresco_bot?start=ref%d`"
+  },
+  {
+    "id": "SuccessRef",
+    "translation": "\uD83C\uDF89 Поздравляю! \n\nВаше реферальное приглашение оказалось успешным, и новый пользователь зарегистрировался по Вашей ссылке! В знак благодарности я активировал для Вас бонусную подписку \"Start\" на 7 дней \uD83C\uDF81✅\n\nНаслаждайтесь расширенными функциями и спасибо, что рассказываете обо мне! \nЕсли у Вас есть вопросы, не стесняйтесь задавать их. Приятного общения! \uD83E\uDD16\uD83E\uDE75"
+  },
+  {
+    "id": "Forget",
+    "translation": "Бот успешно забыл контекст диалога \uD83E\uDDF9"
+  },
+  {
+    "id": "ModeSuccess",
+    "translation": "Бот включил режим %s"
+  },
+  {
+    "id": "EnglishLanguage",
+    "translation": "Английский"
+  },
+  {
+    "id": "RussianLanguage",
+    "translation": "Русский"
+  },
+  {
+    "id": "BackButton",
+    "translation": "Назад"
+  },
+  {
+    "id": "ContextSupportButton",
+    "translation": "Режим диалога"
+  },
+  {
+    "id": "LanguageSelectButton",
+    "translation": "Язык интерфейса"
+  },
+  {
+    "id": "ModeGpt4",
+    "translation": "GPT-4 \uD83E\uDD16"
+  },
+  {
+    "id": "ModeGpt35",
+    "translation": "GPT-3.5 \uD83E\uDD16"
+  },
+  {
+    "id": "ModeDalle3",
+    "translation": "Dall-E 3 \uD83C\uDFA8"
+  },
+  {
+    "id": "OnlyForPremium",
+    "translation": "\uD83E\uDEF0\uD83D\uDCB5 Недоступно для пользователей без подписки"
+  },
+  {
+    "id": "StartCommandDescription",
+    "translation": "Возможности бота"
+  },
+  {
+    "id": "ForgetCommandDescription",
+    "translation": "Забыть контекст диалога"
+  },
+  {
+    "id": "BuyCommandDescription",
+    "translation": "Купить подписку"
+  },
+  {
+    "id": "InviteCommandDescription",
+    "translation": "Пригласить друга"
+  },
+  {
+    "id": "SettingsCommandDescription",
+    "translation": "Настройки бота"
+  }
+]

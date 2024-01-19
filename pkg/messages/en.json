@@ -1,0 +1,126 @@
+[
+  {
+    "id": "StartMsg",
+    "translation": "Hello! \uD83D\uDC4B This is the Telegram bot FrescoAiBot for interacting with the language model ChatGPT and the image generation neural network Dall-E \uD83E\uDD16\n\nIn my free version, you have access to 5\uFE0F⃣ requests per day (they reset every 24 hours). You can increase the number of requests with a monthly subscription:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n\uD83D\uDCB8 Buy subscription /buy\n\n\uD83C\uDF81 I also love giving gifts! You can invite a friend and receive a \"Start\" subscription for 7 days for free. To get a referral link, use the /invite command."
+  },
+  {
+    "id": "BuyMsg",
+    "translation": "\uD83D\uDCB8 Choose a monthly subscription:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n\uD83D\uDCB8 Buy a subscription:\nTether (USDT) TRC20: TBbdyory2Bc4csT5Xc4tieEHptD2XEKeRW"
+  },
+  {
+    "id": "ErrorMsg",
+    "translation": "❌ Something went wrong. \uD83E\uDD15 Try again later."
+  },
+  {
+    "id": "StatusMsg",
+    "translation": "\uD83D\uDCCA Subscription Information\n\nYour subscription: %s (%d requests per day)\nAvailable: %d requests\nValid until: %s\nContact: @dendefoe\n\n\uD83C\uDF81 Invite a friend and get a \"Start\" subscription for 7 days for free. To receive a referral link, use the command /invite\n\n\uD83D\uDCB8 Buy a subscription: /buy"
+  },
+  {
+    "id": "UnsupportedMessageType",
+    "translation": "❌ Sorry, the message type you sent is currently not supported"
+  },
+  {
+    "id": "MessageIsTooShort",
+    "translation": "❌ You have sent a message that is too short. The minimum number of characters is 4."
+  },
+  {
+    "id": "SubscriptionPlanFree",
+    "translation": "✅ Free"
+  },
+  {
+    "id": "SubscriptionPlanStart",
+    "translation": "✅ Start"
+  },
+  {
+    "id": "SubscriptionPlanPro",
+    "translation": "✅ Pro"
+  },
+  {
+    "id": "SubscriptionPlanBoss",
+    "translation": "✅ Boss"
+  },
+  {
+    "id": "SubscriptionPlanHacker",
+    "translation": "✅ Hacker"
+  },
+  {
+    "id": "SettingsMessage",
+    "translation": "\uD83D\uDD27 Bot Settings\n\nIn this section, you can:\n\n✅ Select the interface language (English/Russian).\n\n\uD83E\uDD16 Choose the ChatGPT mode for working with text information.\nFrescoAiBot offers 2 versions:\n\n- GPT-3.5 — this is an advanced next-generation model after GPT-3 (Generative Pre-trained Transformer 3), which is one of the most powerful models for text generation.\n\n- GPT-4 has a larger number of parameters than GPT-3. It has improved abilities in understanding and generating texts, as well as in tasks that require logical thinking and context recognition.\n\n\uD83C\uDFA8 Choose the Dall-E 3 mode for image generation.\n\n\uD83D\uDCAC Enable or disable context support (dialogue mode). When the context is activated, the bot takes its previous response into account and builds upon it."
+  },
+  {
+    "id": "RunOutOfMessages",
+    "translation": "\uD83D\uDE25 Sorry, you have run out of messages.\n\nContact: @dendefoe\n\n\uD83C\uDF81 Invite a friend and get a \"Start\" subscription for 7 days for free. To get a referral link, use the /invite command.\n\uD83D\uDCB8 To purchase a subscription: /buy"
+  },
+  {
+    "id": "InviteLink",
+    "translation": "\uD83C\uDF81 Invite a friend\n\nInvite a friend through the link and receive a \"Start\" gift for 7 days:\n\n `https://t.me/call_fresco_bot?start=ref%d`"
+  },
+  {
+    "id": "SuccessRef",
+    "translation": "\uD83C\uDF89 Congratulations!\n\nYour referral invitation was successful, and a new user has registered using your link! As a token of our gratitude, I have activated a bonus subscription \"Start\" for you for 7 days \uD83C\uDF81✅\n\nEnjoy the extended features and thank you for spreading the word about me!\nIf you have any questions, please feel free to ask. Enjoy your enhanced experience! \uD83E\uDD16\uD83E\uDE75"
+  },
+  {
+    "id": "Forget",
+    "translation": "The bot has successfully forgotten the dialogue context \uD83E\uDDF9"
+  },
+  {
+    "id": "ModeSuccess",
+    "translation": "The bot activated %s mode"
+  },
+  {
+    "id": "EnglishLanguage",
+    "translation": "English"
+  },
+  {
+    "id": "RussianLanguage",
+    "translation": "Russian"
+  },
+  {
+    "id": "BackButton",
+    "translation": "Back"
+  },
+  {
+    "id": "ContextSupportButton",
+    "translation": "Context Support"
+  },
+  {
+    "id": "LanguageSelectButton",
+    "translation": "Select language"
+  },
+  {
+    "id": "ModeGpt4",
+    "translation": "GPT-4 \uD83E\uDD16"
+  },
+  {
+    "id": "ModeGpt35",
+    "translation": "GPT-3.5 \uD83E\uDD16"
+  },
+  {
+    "id": "ModeDalle3",
+    "translation": "Dall-E 3 \uD83C\uDFA8"
+  },
+  {
+    "id": "OnlyForPremium",
+    "translation": "\uD83E\uDEF0\uD83D\uDCB5 Not available for users without a subscription"
+  },
+  {
+    "id": "StartCommandDescription",
+    "translation": "Bot capabilities"
+  },
+  {
+    "id": "ForgetCommandDescription",
+    "translation": "Forget dialogue context"
+  },
+  {
+    "id": "BuyCommandDescription",
+    "translation": "Purchase a subscription"
+  },
+  {
+    "id": "InviteCommandDescription",
+    "translation": "Invite a friend"
+  },
+  {
+    "id": "SettingsCommandDescription",
+    "translation": "Bot settings"
+  }
+]

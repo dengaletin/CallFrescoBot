@@ -2,6 +2,7 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
+	"CallFrescoBot/pkg/utils"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -15,5 +16,5 @@ func (cmd StartCommand) RunCommand() (tg.Chattable, error) {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, consts.StartMsg), nil
+	return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.StartMsg)), nil
 }

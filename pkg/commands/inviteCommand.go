@@ -2,6 +2,7 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
+	"CallFrescoBot/pkg/utils"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -16,7 +17,9 @@ func (cmd InviteCommand) RunCommand() (tg.Chattable, error) {
 		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
 	}
 
-	inviteLink := fmt.Sprintf(consts.InviteLink, cmd.User.TgId)
+	inviteLink := fmt.Sprintf(utils.LocalizeSafe(consts.InviteLink), cmd.User.TgId)
+	message := tg.NewMessage(cmd.Update.Message.Chat.ID, inviteLink)
+	message.ParseMode = "markdown"
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, inviteLink), nil
+	return message, nil
 }
