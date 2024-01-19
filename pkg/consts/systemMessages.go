@@ -32,4 +32,5 @@ const (
 	BuyCommandDescription      = "BuyCommandDescription"
 	InviteCommandDescription   = "InviteCommandDescription"
 	SettingsCommandDescription = "SettingsCommandDescription"
+	StatusCommandDescription   = "StatusCommandDescription"
 )

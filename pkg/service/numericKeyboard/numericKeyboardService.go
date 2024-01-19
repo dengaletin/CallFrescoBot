@@ -40,7 +40,7 @@ func CreateMainMenu() error {
 		},
 		tg.BotCommand{
 			Command:     "/status",
-			Description: utils.LocalizeSafe(consts.StartCommandDescription),
+			Description: utils.LocalizeSafe(consts.StatusCommandDescription),
 		},
 		tg.BotCommand{
 			Command:     "/buy",
