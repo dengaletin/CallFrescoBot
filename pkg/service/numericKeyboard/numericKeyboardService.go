@@ -39,6 +39,10 @@ func CreateMainMenu() error {
 			Description: utils.LocalizeSafe(consts.ForgetCommandDescription),
 		},
 		tg.BotCommand{
+			Command:     "/status",
+			Description: utils.LocalizeSafe(consts.StartCommandDescription),
+		},
+		tg.BotCommand{
 			Command:     "/buy",
 			Description: utils.LocalizeSafe(consts.BuyCommandDescription),
 		},

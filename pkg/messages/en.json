@@ -122,5 +122,9 @@
   {
     "id": "SettingsCommandDescription",
     "translation": "Bot settings"
+  },
+  {
+    "id": "StatusCommandDescription",
+    "translation": "My subscription"
   }
 ]
