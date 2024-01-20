@@ -49,11 +49,7 @@ func processUpdates(updates tg.UpdatesChannel) {
 			logAndNotify(messageInfo, userServiceErr)
 		}
 
-		locErr := utils.CreateLoc(user)
-		if locErr != nil {
-			log.Printf(locErr.Error())
-			logAndNotify(messageInfo, locErr)
-		}
+		utils.InitBundle(user.Lang)
 
 		mainMenuErr := numericKeyboard.CreateMainMenu()
 		if mainMenuErr != nil {

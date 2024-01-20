@@ -17,6 +17,7 @@ import (
 type QueryData struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
+	Extra string `json:"extra"`
 }
 
 func ResolveAndHandle(query *tgbotapi.CallbackQuery, user *models.User, bot *tgbotapi.BotAPI) error {
@@ -28,22 +29,22 @@ func ResolveAndHandle(query *tgbotapi.CallbackQuery, user *models.User, bot *tgb
 
 	switch data.Type {
 	case "mode":
-		err := handleMode(data.Value, user, bot, query)
+		err := handleMode(data, user, bot, query)
 		if err != nil {
 			return err
 		}
 	case "context":
-		err := handleContext(data.Value, user, bot, query)
+		err := handleContext(data, user, bot, query)
 		if err != nil {
 			return err
 		}
 	case "open":
-		err := handleOpen(data.Value, user, bot, query)
+		err := handleOpen(data, user, bot, query)
 		if err != nil {
 			return err
 		}
 	case "language":
-		err := handleLanguage(data.Value, user, bot, query)
+		err := handleLanguage(data, user, bot, query)
 		if err != nil {
 			return err
 		}
@@ -56,16 +57,16 @@ func ResolveAndHandle(query *tgbotapi.CallbackQuery, user *models.User, bot *tgb
 	return nil
 }
 
-func handleOpen(value string, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
-	keyboard := "settings"
+func handleOpen(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
+	keyboard := "main"
 
-	switch value {
-	case "settings":
-		keyboard = "settings"
+	switch data.Value {
+	case "main":
+		keyboard = "main"
 	case "language":
 		keyboard = "language"
 	default:
-		log.Printf("Unknown open type: %s", value)
+		log.Printf("Unknown open type: %s", data.Value)
 	}
 
 	_, err := bot.Request(tgbotapi.NewCallback(query.ID, ""))
@@ -74,7 +75,7 @@ func handleOpen(value string, user *models.User, bot *tgbotapi.BotAPI, query *tg
 		return err
 	}
 
-	nk, err := numericKeyboard.CreateNumericKeyboard(keyboard, user)
+	nk, err := numericKeyboard.CreateNumericKeyboard(keyboard, user, data.Extra)
 	if err != nil {
 		log.Printf("Error creating keyboard: %v", err)
 		return err
@@ -92,14 +93,14 @@ func handleOpen(value string, user *models.User, bot *tgbotapi.BotAPI, query *tg
 	return nil
 }
 
-func handleLanguage(value string, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
+func handleLanguage(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
 	_, err := bot.Request(tgbotapi.NewCallback(query.ID, ""))
 	if err != nil {
 		log.Printf("Error while responding to callback query: %s", err)
 		return err
 	}
 
-	language, err := strconv.ParseInt(value, 10, 64)
+	language, err := strconv.ParseInt(data.Value, 10, 64)
 	if err != nil {
 		log.Printf("handleMode: parse int64 error: %v", err)
 		return err
@@ -110,17 +111,14 @@ func handleLanguage(value string, user *models.User, bot *tgbotapi.BotAPI, query
 		return err
 	}
 
-	locErr := utils.CreateLoc(user)
-	if locErr != nil {
-		log.Printf(locErr.Error())
-	}
+	utils.InitBundle(user.Lang)
 
 	mainMenuErr := numericKeyboard.CreateMainMenu()
 	if mainMenuErr != nil {
 		log.Printf(mainMenuErr.Error())
 	}
 
-	nk, err := numericKeyboard.CreateNumericKeyboard("language", user)
+	nk, err := numericKeyboard.CreateNumericKeyboard("language", user, data.Extra)
 	if err != nil {
 		log.Printf("Error creating keyboard: %v", err)
 		return err
@@ -132,10 +130,15 @@ func handleLanguage(value string, user *models.User, bot *tgbotapi.BotAPI, query
 		return errors.New("numeric keyboard is nil")
 	}
 
+	message := utils.LocalizeSafe(consts.StartMsg)
+	if data.Extra == "options" {
+		message = utils.LocalizeSafe(consts.OptionsMessage)
+	}
+
 	_, err = bot.Send(tgbotapi.NewEditMessageText(
 		query.Message.Chat.ID,
 		query.Message.MessageID,
-		utils.LocalizeSafe(consts.SettingsMessage),
+		message,
 	))
 	if err != nil {
 		return err
@@ -153,14 +156,14 @@ func handleLanguage(value string, user *models.User, bot *tgbotapi.BotAPI, query
 	return nil
 }
 
-func handleMode(value string, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
+func handleMode(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
 	_, err := bot.Request(tgbotapi.NewCallback(query.ID, ""))
 	if err != nil {
 		log.Printf("Error while responding to callback query: %s", err)
 		return err
 	}
 
-	mode, err := strconv.ParseInt(value, 10, 64)
+	mode, err := strconv.ParseInt(data.Value, 10, 64)
 	if err != nil {
 		log.Printf("handleMode: parse int64 error: %v", err)
 		return err
@@ -184,7 +187,7 @@ func handleMode(value string, user *models.User, bot *tgbotapi.BotAPI, query *tg
 		return err
 	}
 
-	nk, err := numericKeyboard.CreateNumericKeyboard("settings", user)
+	nk, err := numericKeyboard.CreateNumericKeyboard(data.Extra, user, data.Extra)
 	if err != nil {
 		log.Printf("Error creating keyboard: %v", err)
 		return err
@@ -207,14 +210,14 @@ func handleMode(value string, user *models.User, bot *tgbotapi.BotAPI, query *tg
 	return nil
 }
 
-func handleContext(value string, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
+func handleContext(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
 	_, err := bot.Request(tgbotapi.NewCallback(query.ID, ""))
 	if err != nil {
 		log.Printf("Error while responding to callback query: %s", err)
 		return err
 	}
 
-	context, err := strconv.ParseInt(value, 10, 64)
+	context, err := strconv.ParseInt(data.Value, 10, 64)
 	if err != nil {
 		log.Printf("handleContext: parse int64 error: %v", err)
 		return err
@@ -238,7 +241,7 @@ func handleContext(value string, user *models.User, bot *tgbotapi.BotAPI, query 
 		return err
 	}
 
-	nk, err := numericKeyboard.CreateNumericKeyboard("settings", user)
+	nk, err := numericKeyboard.CreateNumericKeyboard(data.Extra, user, data.Extra)
 	if err != nil {
 		log.Printf("Error creating keyboard: %v", err)
 		return err

@@ -2,66 +2,53 @@ package utils
 
 import (
 	"CallFrescoBot/pkg/consts"
-	"CallFrescoBot/pkg/models"
 	"encoding/json"
-	"errors"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 	"log"
 	"path/filepath"
 )
 
-var loc *i18n.Localizer
+var localizer *i18n.Localizer
 
-func CreateLoc(user *models.User) error {
-	lang, err := resolveLangById(user.Lang)
-	if err != nil {
-		return err
-	}
-
+func InitBundle(langID int64) {
 	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 
-	_, err = bundle.LoadMessageFile(filepath.Join("pkg/messages", "en.json"))
-	if err != nil {
-		return err
-	}
-	_, err = bundle.LoadMessageFile(filepath.Join("pkg/messages", "ru.json"))
-	if err != nil {
-		return err
+	messageFiles := []string{"en.json", "ru.json"}
+	for _, f := range messageFiles {
+		filePath := filepath.Join("pkg/messages", f)
+		_, err := bundle.LoadMessageFile(filePath)
+		if err != nil {
+			log.Fatalf("failed to load message file '%s': %v", filePath, err)
+		}
 	}
 
-	loc = i18n.NewLocalizer(bundle, lang)
-
-	return err
+	lang := resolveLangById(langID)
+	localizer = i18n.NewLocalizer(bundle, lang)
 }
 
 func LocalizeSafe(messageID string) string {
-	localizer := getLoc()
-
 	localized, err := localizer.Localize(&i18n.LocalizeConfig{
-		MessageID: messageID,
+		DefaultMessage: &i18n.Message{
+			ID: messageID,
+		},
 	})
 	if err != nil {
 		log.Printf("Error localizing message '%s': %v", messageID, err)
-
 		return messageID
 	}
 
 	return localized
 }
 
-func getLoc() *i18n.Localizer {
-	return loc
-}
-
-func resolveLangById(id int64) (string, error) {
+func resolveLangById(id int64) string {
 	switch id {
 	case consts.LangEn:
-		return "en", nil
+		return "en"
 	case consts.LangRu:
-		return "ru", nil
+		return "ru"
 	default:
-		return "", errors.New("unsupported language")
+		return "en"
 	}
 }

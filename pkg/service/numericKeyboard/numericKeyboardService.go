@@ -6,6 +6,7 @@ import (
 	"CallFrescoBot/pkg/utils"
 	"encoding/json"
 	"errors"
+	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"strconv"
 )
@@ -24,6 +25,7 @@ const (
 type keyboardPayload struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
+	Extra string `json:"extra"`
 }
 
 func CreateMainMenu() error {
@@ -51,8 +53,8 @@ func CreateMainMenu() error {
 			Description: utils.LocalizeSafe(consts.InviteCommandDescription),
 		},
 		tg.BotCommand{
-			Command:     "/settings",
-			Description: utils.LocalizeSafe(consts.SettingsCommandDescription),
+			Command:     "/options",
+			Description: utils.LocalizeSafe(consts.OptionsCommandDescription),
 		},
 	)
 
@@ -64,21 +66,24 @@ func CreateMainMenu() error {
 	return nil
 }
 
-func CreateNumericKeyboard(keyboardType string, user *models.User) (*tg.InlineKeyboardMarkup, error) {
+func CreateNumericKeyboard(keyboardType string, user *models.User, extra string) (*tg.InlineKeyboardMarkup, error) {
 	switch keyboardType {
-	case "settings":
-		return createSettingsKeyboard(user), nil
+	case "main":
+		return createMainKeyboard(user, extra), nil
+	case "options":
+		return createMainKeyboard(user, extra), nil
 	case "language":
-		return createLanguageKeyboard(user), nil
+		return createLanguageKeyboard(user, extra), nil
 	default:
+		fmt.Print(keyboardType)
 		return nil, errors.New("unknown keyboard type")
 	}
 }
 
-func createLanguageKeyboard(user *models.User) *tg.InlineKeyboardMarkup {
-	englishButton := createButtonWithLang(utils.LocalizeSafe(consts.EnglishLanguage), user.Lang, 1)
-	russianButton := createButtonWithLang(utils.LocalizeSafe(consts.RussianLanguage), user.Lang, 2)
-	backButton := createButtonBack(utils.LocalizeSafe(consts.BackButton))
+func createLanguageKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
+	englishButton := createButtonWithLang(utils.LocalizeSafe(consts.EnglishLanguage), user.Lang, 1, extra)
+	russianButton := createButtonWithLang(utils.LocalizeSafe(consts.RussianLanguage), user.Lang, 2, extra)
+	backButton := createButtonBack(utils.LocalizeSafe(consts.BackButton), extra)
 
 	keyboard := tg.NewInlineKeyboardMarkup(
 		tg.NewInlineKeyboardRow(englishButton, russianButton),
@@ -88,12 +93,12 @@ func createLanguageKeyboard(user *models.User) *tg.InlineKeyboardMarkup {
 	return &keyboard
 }
 
-func createSettingsKeyboard(user *models.User) *tg.InlineKeyboardMarkup {
-	chatGPTButton := createButtonWithMode("GPT3.5", user.Mode, ModeChatGPT35)
-	dalleButton := createButtonWithMode("DallE3", user.Mode, ModeDallE)
-	chatGPT4Button := createButtonWithMode("GPT4", user.Mode, ModeChatGPT4)
-	contextButton := createButtonWithContext(utils.LocalizeSafe(consts.ContextSupportButton), user.Dialog)
-	languageButton := createButtonWithLanguage(utils.LocalizeSafe(consts.LanguageSelectButton))
+func createMainKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
+	chatGPTButton := createButtonWithMode("GPT3.5", extra, user.Mode, ModeChatGPT35)
+	dalleButton := createButtonWithMode("DallE3", extra, user.Mode, ModeDallE)
+	chatGPT4Button := createButtonWithMode("GPT4", extra, user.Mode, ModeChatGPT4)
+	contextButton := createButtonWithContext(utils.LocalizeSafe(consts.ContextSupportButton), extra, user.Dialog)
+	languageButton := createButtonWithLanguage(utils.LocalizeSafe(consts.LanguageSelectButton), extra)
 
 	keyboard := tg.NewInlineKeyboardMarkup(
 		tg.NewInlineKeyboardRow(chatGPTButton, dalleButton, chatGPT4Button),
@@ -112,7 +117,7 @@ func createPayloadData(payload keyboardPayload) string {
 	return string(data)
 }
 
-func createButtonWithMode(text string, mode int64, buttonMode int64) tg.InlineKeyboardButton {
+func createButtonWithMode(text string, extra string, mode int64, buttonMode int64) tg.InlineKeyboardButton {
 	activePrefix := "✅ "
 	if mode == buttonMode {
 		text = activePrefix + text
@@ -120,11 +125,12 @@ func createButtonWithMode(text string, mode int64, buttonMode int64) tg.InlineKe
 	payload := createPayloadData(keyboardPayload{
 		Type:  "mode",
 		Value: strconv.FormatInt(buttonMode, 10),
+		Extra: extra,
 	})
 	return tg.NewInlineKeyboardButtonData(text, payload)
 }
 
-func createButtonWithLang(text string, mode int64, buttonMode int64) tg.InlineKeyboardButton {
+func createButtonWithLang(text string, mode int64, buttonMode int64, extra string) tg.InlineKeyboardButton {
 	activePrefix := "✅ "
 	if mode == buttonMode {
 		text = activePrefix + text
@@ -132,12 +138,13 @@ func createButtonWithLang(text string, mode int64, buttonMode int64) tg.InlineKe
 	payload := createPayloadData(keyboardPayload{
 		Type:  "language",
 		Value: strconv.FormatInt(buttonMode, 10),
+		Extra: extra,
 	})
 
 	return tg.NewInlineKeyboardButtonData(text, payload)
 }
 
-func createButtonWithContext(text string, dialog int64) tg.InlineKeyboardButton {
+func createButtonWithContext(text string, extra string, dialog int64) tg.InlineKeyboardButton {
 	activePrefix := "✅ "
 	buttonValue := DialogOn
 	if dialog == DialogOn {
@@ -147,23 +154,26 @@ func createButtonWithContext(text string, dialog int64) tg.InlineKeyboardButton 
 	payload := createPayloadData(keyboardPayload{
 		Type:  "context",
 		Value: strconv.Itoa(buttonValue),
+		Extra: extra,
 	})
 	return tg.NewInlineKeyboardButtonData(text, payload)
 }
 
-func createButtonWithLanguage(text string) tg.InlineKeyboardButton {
+func createButtonWithLanguage(text string, extra string) tg.InlineKeyboardButton {
 	payload := createPayloadData(keyboardPayload{
 		Type:  "open",
 		Value: "language",
+		Extra: extra,
 	})
 
 	return tg.NewInlineKeyboardButtonData(text, payload)
 }
 
-func createButtonBack(text string) tg.InlineKeyboardButton {
+func createButtonBack(text string, extra string) tg.InlineKeyboardButton {
 	payload := createPayloadData(keyboardPayload{
 		Type:  "open",
-		Value: "settings",
+		Value: "main",
+		Extra: extra,
 	})
 
 	return tg.NewInlineKeyboardButtonData(text, payload)

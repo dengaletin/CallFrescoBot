@@ -44,8 +44,8 @@
     "translation": "✅ Hacker"
   },
   {
-    "id": "SettingsMessage",
-    "translation": "\uD83D\uDD27 Bot Settings\n\nIn this section, you can:\n\n✅ Select the interface language (English/Russian).\n\n\uD83E\uDD16 Choose the ChatGPT mode for working with text information.\nFrescoAiBot offers 2 versions:\n\n- GPT-3.5 — this is an advanced next-generation model after GPT-3 (Generative Pre-trained Transformer 3), which is one of the most powerful models for text generation.\n\n- GPT-4 has a larger number of parameters than GPT-3. It has improved abilities in understanding and generating texts, as well as in tasks that require logical thinking and context recognition.\n\n\uD83C\uDFA8 Choose the Dall-E 3 mode for image generation.\n\n\uD83D\uDCAC Enable or disable context support (dialogue mode). When the context is activated, the bot takes its previous response into account and builds upon it."
+    "id": "OptionsMessage",
+    "translation": "\uD83D\uDD27 Bot Options\n\nIn this section, you can:\n\n✅ Select the interface language (English/Russian).\n\n\uD83E\uDD16 Choose the ChatGPT mode for working with text information.\nFrescoAiBot offers 2 versions:\n\n- GPT-3.5 — this is an advanced next-generation model after GPT-3 (Generative Pre-trained Transformer 3), which is one of the most powerful models for text generation.\n\n- GPT-4 has a larger number of parameters than GPT-3. It has improved abilities in understanding and generating texts, as well as in tasks that require logical thinking and context recognition.\n\n\uD83C\uDFA8 Choose the Dall-E 3 mode for image generation.\n\n\uD83D\uDCAC Enable or disable context support (dialogue mode). When the context is activated, the bot takes its previous response into account and builds upon it."
   },
   {
     "id": "RunOutOfMessages",
@@ -53,7 +53,7 @@
   },
   {
     "id": "InviteLink",
-    "translation": "\uD83C\uDF81 Invite a friend\n\nInvite a friend through the link and receive a \"Start\" gift for 7 days:\n\n `https://t.me/call_fresco_bot?start=ref%d`"
+    "translation": "\uD83C\uDF81 Invite a friend\n\nInvite a friend via the link and get a \"Start\" subscription for 7 days as a gift:\n\n `https://t.me/call_fresco_bot?start=ref%d`"
   },
   {
     "id": "SuccessRef",
@@ -120,8 +120,8 @@
     "translation": "Invite a friend"
   },
   {
-    "id": "SettingsCommandDescription",
-    "translation": "Bot settings"
+    "id": "OptionsCommandDescription",
+    "translation": "Bot options"
   },
   {
     "id": "StatusCommandDescription",
