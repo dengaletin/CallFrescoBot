@@ -36,50 +36,83 @@ func processUpdates(updates tg.UpdatesChannel) {
 			continue
 		}
 
-		message, from, messageServiceErr := messageService.ParseUpdate(update)
-		if messageServiceErr != nil {
-			logAndNotify("", messageServiceErr)
-		}
-
-		messageInfo := formatMessageInfo(message)
-		log.Printf(messageInfo)
-
-		user, userServiceErr := userService.GetOrCreate(from)
-		if userServiceErr != nil {
-			logAndNotify(messageInfo, userServiceErr)
-		}
-
-		utils.InitBundle(user.Lang)
-
-		mainMenuErr := numericKeyboard.CreateMainMenu()
-		if mainMenuErr != nil {
-			log.Printf(mainMenuErr.Error())
-			logAndNotify(messageInfo, mainMenuErr)
-		}
-
-		if update.CallbackQuery != nil {
-			fmt.Println(update.CallbackQuery.Data)
-			callbackErr := callbackService.ResolveAndHandle(update.CallbackQuery, user, bot)
-			if callbackErr != nil {
-				log.Printf(callbackErr.Error())
-				logAndNotify(messageInfo, callbackErr)
-			}
-		}
-
-		if update.Message == nil {
-			continue
-		}
-
-		response, commandErr := commands.GetCommand(update, user).RunCommand()
-		if commandErr != nil {
-			logAndNotify(messageInfo, commandErr)
-		}
-
-		if err := sendBotResponse(bot, response); err != nil {
-			log.Printf(err.Error())
-			logAndNotify(messageInfo, err)
+		if err := handleUpdate(update, bot); err != nil {
+			log.Printf("Error handling update: %v", err)
 		}
 	}
+}
+
+func handleUpdate(update tg.Update, bot *tg.BotAPI) error {
+	var messageInfo string
+	if update.Message != nil {
+		messageInfo = formatMessageInfo(update.Message)
+		log.Printf(messageInfo)
+	}
+
+	if update.CallbackQuery != nil {
+		messageInfo = formatMessageInfo(update.CallbackQuery.Message)
+		log.Printf(messageInfo)
+	}
+
+	if err := processMessage(update, bot, messageInfo); err != nil {
+		return fmt.Errorf("process message error: %w", err)
+	}
+
+	if err := processCallback(update, bot, messageInfo); err != nil {
+		return fmt.Errorf("process callback error: %w", err)
+	}
+
+	return nil
+}
+
+func processMessage(update tg.Update, bot *tg.BotAPI, messageInfo string) error {
+	if update.Message == nil {
+		return nil
+	}
+
+	_, from, messageServiceErr := messageService.ParseUpdate(update)
+	if err := logAndNotifyOnErr("", messageServiceErr); err != nil {
+		return err
+	}
+
+	user, userServiceErr := userService.GetOrCreate(from)
+	if err := logAndNotifyOnErr(messageInfo, userServiceErr); err != nil {
+		return err
+	}
+
+	utils.InitBundle(user.Lang)
+
+	if mainMenuErr := numericKeyboard.CreateMainMenu(); mainMenuErr != nil {
+		return logAndNotifyOnErr(messageInfo, mainMenuErr)
+	}
+
+	response, commandErr := commands.GetCommand(update, user).RunCommand()
+	if err := logAndNotifyOnErr(messageInfo, commandErr); err != nil {
+		return err
+	}
+
+	return sendBotResponse(bot, response)
+}
+
+func processCallback(update tg.Update, bot *tg.BotAPI, messageInfo string) error {
+	if update.CallbackQuery == nil {
+		return nil
+	}
+
+	fmt.Println(update.CallbackQuery.Data)
+	user, userServiceErr := userService.GetOrCreate(update.CallbackQuery.From)
+	if userServiceErr != nil {
+		return fmt.Errorf("get user error: %w", userServiceErr)
+	}
+
+	utils.InitBundle(user.Lang)
+
+	callbackErr := callbackService.ResolveAndHandle(update.CallbackQuery, user, bot)
+	if err := logAndNotifyOnErr(messageInfo, callbackErr); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func formatMessageInfo(message *tg.Message) string {
@@ -91,12 +124,17 @@ func formatMessageInfo(message *tg.Message) string {
 	)
 }
 
-func logAndNotify(messageInfo string, err error) {
-	log.Printf(err.Error())
-	errMsg := fmt.Sprintf("❌❌❌ Error: [%s] %s", messageInfo, err.Error())
-	if notifyErr := messageService.SendMsgToUser(consts.LogErrorRecipient, errMsg); notifyErr != nil {
-		log.Printf(notifyErr.Error())
+func logAndNotifyOnErr(messageInfo string, err error) error {
+	if err != nil {
+		log.Printf(err.Error())
+		errMsg := fmt.Sprintf("❌❌❌ Error: [%s] %s", messageInfo, err.Error())
+		if notifyErr := messageService.SendMsgToUser(consts.LogErrorRecipient, errMsg); notifyErr != nil {
+			log.Printf(notifyErr.Error())
+			return fmt.Errorf("error sending notification: %w", notifyErr)
+		}
+		return err
 	}
+	return nil
 }
 
 func sendBotResponse(bot *tg.BotAPI, response tg.Chattable) error {
@@ -104,5 +142,6 @@ func sendBotResponse(bot *tg.BotAPI, response tg.Chattable) error {
 		return nil
 	}
 	_, err := bot.Send(response)
+
 	return err
 }
