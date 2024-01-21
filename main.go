@@ -12,12 +12,30 @@ import (
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"net/http"
 )
 
 func main() {
 	app.SetupApp()
+	go setupServer()
 	updates := initBotUpdates(15)
 	processUpdates(updates)
+}
+
+func setupServer() {
+	http.HandleFunc("/payment-callback", postHandler)
+
+	if err := http.ListenAndServe(":8081", nil); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+}
+
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		fmt.Fprintln(w, "OK")
+	} else {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	}
 }
 
 func initBotUpdates(timeout int) tg.UpdatesChannel {
