@@ -107,3 +107,16 @@ func SetDialogFromId(messageId uint64, user *models.User, db *gorm.DB) error {
 
 	return nil
 }
+
+func ResetSubscription(user *models.User, db *gorm.DB) error {
+	result := db.Model(user).Updates(map[string]interface{}{
+		"mode":   0,
+		"dialog": 0,
+	})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

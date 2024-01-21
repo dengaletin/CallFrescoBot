@@ -4,6 +4,7 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	subscriptionRepository "CallFrescoBot/pkg/repositories/subscription"
+	userRepository "CallFrescoBot/pkg/repositories/user"
 	"CallFrescoBot/pkg/utils"
 	"errors"
 	"gorm.io/gorm"
@@ -30,6 +31,24 @@ func GetUserSubscription(user *models.User) (*models.Subscription, error) {
 	}
 
 	return subscription, nil
+}
+
+func ResetSubscription(user *models.User) error {
+	db, err := getDBConnection()
+	if err != nil {
+		return err
+	}
+
+	subscription, err := getSubscription(user, db)
+
+	if subscription == nil && user.Mode == 2 || user.Dialog == 1 {
+		resetErr := userRepository.ResetSubscription(user, db)
+		if resetErr != nil {
+			return resetErr
+		}
+	}
+
+	return nil
 }
 
 func getSubscription(user *models.User, db *gorm.DB) (*models.Subscription, error) {
