@@ -79,6 +79,7 @@ func AutoMigrateDB() error {
 		&models.Message{},
 		&models.Subscription{},
 		&models.UserRef{},
+		&models.Invoice{},
 	)
 
 	return err

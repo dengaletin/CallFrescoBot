@@ -5,7 +5,7 @@
   },
   {
     "id": "BuyMsg",
-    "translation": "\uD83D\uDCB8 Choose a monthly subscription:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n\uD83D\uDCB8 Buy a subscription:\nTether (USDT) TRC20: TBbdyory2Bc4csT5Xc4tieEHptD2XEKeRW"
+    "translation": "\uD83D\uDCB8 Choose a monthly subscription:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n\uD83D\uDCB8 Buy a subscription:"
   },
   {
     "id": "ErrorMsg",
@@ -126,5 +126,17 @@
   {
     "id": "StatusCommandDescription",
     "translation": "My subscription"
+  },
+  {
+    "id": "BuyPlan1",
+    "translation": "Buy Start"
+  },
+  {
+    "id": "BuyPlan2",
+    "translation": "Buy Pro"
+  },
+  {
+    "id": "BuyPlan3",
+    "translation": "Buy Boss"
   }
 ]

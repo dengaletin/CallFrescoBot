@@ -59,6 +59,18 @@ func getSubscription(user *models.User, db *gorm.DB) (*models.Subscription, erro
 	return subscription, nil
 }
 
+func Create(user *models.User, limit int) (*models.Subscription, error) {
+	db, err := getDBConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var subscription *models.Subscription
+	subscription, err = subscriptionRepository.CreateSubscription(user, limit, 30, db)
+
+	return subscription, nil
+}
+
 func GetOrCreate(user *models.User, limit int, daysMultiplier int) (*models.Subscription, error) {
 	db, err := getDBConnection()
 	if err != nil {

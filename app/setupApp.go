@@ -1,16 +1,28 @@
 package app
 
 import (
+	paymentCallbackService "CallFrescoBot/pkg/service/paymentCallback"
 	"CallFrescoBot/pkg/utils"
 	"github.com/pkg/errors"
 	"log"
+	"net/http"
 )
 
 func SetupApp() {
 	log.Println("Initializing service")
 
+	go setupServer()
+
 	if err := createResources(); err != nil {
 		log.Printf("Error occurred while setting up the app: %s", err)
+	}
+}
+
+func setupServer() {
+	http.HandleFunc("/payment-callback", paymentCallbackService.PaymentCallbackHandler)
+
+	if err := http.ListenAndServe(":8081", nil); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
 

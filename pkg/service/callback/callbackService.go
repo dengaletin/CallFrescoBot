@@ -65,6 +65,10 @@ func handleOpen(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *
 		keyboard = "main"
 	case "language":
 		keyboard = "language"
+	case "buyLink":
+		keyboard = "buyLink"
+	case "buy":
+		keyboard = "buy"
 	default:
 		log.Printf("Unknown open type: %s", data.Value)
 	}
