@@ -28,7 +28,7 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := r.ParseMultipartForm(0)
+	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "error parsing form", http.StatusBadRequest)
 		return
