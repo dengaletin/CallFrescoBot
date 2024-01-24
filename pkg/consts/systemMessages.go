@@ -36,4 +36,5 @@ const (
 	BuyPlan1                  = "BuyPlan1"
 	BuyPlan2                  = "BuyPlan2"
 	BuyPlan3                  = "BuyPlan3"
+	SubscriptionSuccess       = "SubscriptionSuccess"
 )

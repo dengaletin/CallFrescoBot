@@ -138,5 +138,9 @@
   {
     "id": "BuyPlan3",
     "translation": "Buy Boss"
+  },
+  {
+    "id": "SubscriptionSuccess",
+    "translation": "\uD83C\uDF89 Congratulations! Your payment has been processed successfully! \uD83E\uDD73\n\n\uD83D\uDCA1 You now have access to all the premium features of our bot. Start exploring the new possibilities right now and get the most out of our service!\n\n\uD83D\uDD12 Thank you for trusting our bot. We promise continuous improvement and updating of our services for your convenience.\n\n✅ Enjoy your subscription and look forward to loads of useful content!\n\nIf you have any questions or need support, please contact us at any time - we are always happy to help!"
   }
 ]

@@ -1,6 +1,7 @@
 package paymentCallbackService
 
 import (
+	"CallFrescoBot/pkg/consts"
 	payService "CallFrescoBot/pkg/service/invoice"
 	subsciptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
@@ -85,7 +86,7 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = subsciptionService.Create(user, invoice.Coin)
 
 	bot := utils.GetBot()
-	msg := tg.NewMessage(user.TgId, "Subscription activated")
+	msg := tg.NewMessage(user.TgId, utils.LocalizeSafe(consts.SubscriptionSuccess))
 	_, err = bot.Send(msg)
 	if err != nil {
 		return
