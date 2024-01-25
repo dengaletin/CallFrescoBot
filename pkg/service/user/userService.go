@@ -64,6 +64,14 @@ func GerUserByTgId(tgId int64) (*models.User, error) {
 	return userRepository.GerUserByTgId(tgId, db)
 }
 
+func GetUserById(id uint64) (*models.User, error) {
+	db, err := dbConnection()
+	if err != nil {
+		return nil, err
+	}
+	return userRepository.GetUserById(id, db)
+}
+
 func SetMode(mode int64, user *models.User) error {
 	db, err := dbConnection()
 	if err != nil {

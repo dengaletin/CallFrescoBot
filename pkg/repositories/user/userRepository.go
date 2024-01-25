@@ -34,6 +34,16 @@ func GerUserByTgId(tdId int64, db *gorm.DB) (*models.User, error) {
 	return user, nil
 }
 
+func GetUserById(id uint64, db *gorm.DB) (*models.User, error) {
+	var user *models.User
+	err := db.Where(models.User{Id: id}).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func SetMode(mode int64, user *models.User, db *gorm.DB) error {
 	modes := []int64{0, 1, 2}
 	modeStatus := slices.Contains(modes, mode)

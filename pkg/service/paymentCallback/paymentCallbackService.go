@@ -76,7 +76,7 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := userService.GerUserByTgId(invoice.User.TgId)
+	user, err := userService.GetUserById(invoice.UserId)
 	invoice.Status = 1
 
 	_, err = payService.UpdateInvoice(invoice)
