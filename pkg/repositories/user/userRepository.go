@@ -12,16 +12,37 @@ import (
 )
 
 func FirstOrCreate(tgUser *tg.User, db *gorm.DB) (*models.User, error) {
-	var user *models.User
-	result := db.Where(models.User{TgId: tgUser.ID, Name: tgUser.UserName}).FirstOrCreate(&user)
+	var user models.User
+	result := db.Where("tg_id = ?", tgUser.ID).First(&user)
 
-	if result.RowsAffected == 0 && user.IsNew == true {
-		db.Model(&user).Update("is_new", false)
-	} else if result.RowsAffected == 0 {
-		db.Model(&user).Update("last_login", time.Now())
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		newUser := models.User{
+			TgId:  tgUser.ID,
+			Name:  tgUser.UserName,
+			IsNew: true,
+		}
+		if err := db.Create(&newUser).Error; err != nil {
+			return nil, err
+		}
+
+		return &newUser, nil
+	} else if result.Error != nil {
+		return nil, result.Error
 	}
 
-	return user, nil
+	updates := map[string]interface{}{}
+	if user.IsNew {
+		updates["is_new"] = false
+	}
+	if user.Name != tgUser.UserName {
+		updates["name"] = tgUser.UserName
+	}
+	updates["last_login"] = time.Now()
+	if err := db.Model(&user).Updates(updates).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func GerUserByTgId(tdId int64, db *gorm.DB) (*models.User, error) {

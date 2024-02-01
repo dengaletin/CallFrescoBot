@@ -41,7 +41,7 @@ func ResetSubscription(user *models.User) error {
 
 	subscription, err := getSubscription(user, db)
 
-	if subscription == nil && user.Mode == 2 || user.Dialog == 1 {
+	if subscription == nil && (user.Mode == 2 || user.Dialog == 1) {
 		resetErr := userRepository.ResetSubscription(user, db)
 		if resetErr != nil {
 			return resetErr
