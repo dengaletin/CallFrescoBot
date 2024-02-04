@@ -37,4 +37,6 @@ const (
 	BuyPlan2                  = "BuyPlan2"
 	BuyPlan3                  = "BuyPlan3"
 	SubscriptionSuccess       = "SubscriptionSuccess"
+	GptLoading                = "GptLoading"
+	DalleLoading              = "DalleLoading"
 )

@@ -22,6 +22,11 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 		return nil, errors.New(consts.ErrorMissingGptKey)
 	}
 
+	sendMsgErr := messageService.SendMsgToUser(update.Message.Chat.ID, utils.LocalizeSafe(consts.DalleLoading))
+	if sendMsgErr != nil {
+		return nil, sendMsgErr
+	}
+
 	return getImageResponse(update, user)
 }
 

@@ -87,8 +87,8 @@ func processMessage(update tg.Update, bot *tg.BotAPI, messageInfo string) error 
 	}
 
 	response, commandErr := commands.GetCommand(update, user).RunCommand()
-	if err := logAndNotifyOnErr(messageInfo, commandErr); err != nil {
-		return err
+	if notifyErr := logAndNotifyOnErr(messageInfo, commandErr); notifyErr != nil {
+		return notifyErr
 	}
 
 	return sendBotResponse(bot, response)
@@ -132,7 +132,6 @@ func logAndNotifyOnErr(messageInfo string, err error) error {
 			log.Printf(notifyErr.Error())
 			return fmt.Errorf("error sending notification: %w", notifyErr)
 		}
-		return err
 	}
 	return nil
 }

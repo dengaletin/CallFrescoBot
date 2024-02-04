@@ -40,6 +40,12 @@ func GetResponse(update tg.Update, user *models.User, model string) (tg.Chattabl
 	}
 
 	client := openai.NewClient(utils.GetEnvVar("GPT_API_KEY"))
+
+	sendMsgErr := messageService.SendMsgToUser(update.Message.Chat.ID, utils.LocalizeSafe(consts.GptLoading))
+	if sendMsgErr != nil {
+		return nil, sendMsgErr
+	}
+
 	request := createRequest(user, update, model)
 
 	resp, err := getResponseFromGPT(client, request)
