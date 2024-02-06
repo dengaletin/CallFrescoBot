@@ -36,9 +36,11 @@ func processUpdates(updates tg.UpdatesChannel) {
 			continue
 		}
 
-		if err := handleUpdate(update, bot); err != nil {
-			log.Printf("Error handling update: %v", err)
-		}
+		go func(upd tg.Update) {
+			if err := handleUpdate(upd, bot); err != nil {
+				log.Printf("Error handling update: %v", err)
+			}
+		}(update)
 	}
 }
 
@@ -55,6 +57,11 @@ func handleUpdate(update tg.Update, bot *tg.BotAPI) error {
 	}
 
 	if err := processMessage(update, bot, messageInfo); err != nil {
+		sendMsgErr := messageService.SendMsgToUser(update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))
+		if sendMsgErr != nil {
+			return sendMsgErr
+		}
+
 		return fmt.Errorf("process message error: %w", err)
 	}
 

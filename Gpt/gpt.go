@@ -27,9 +27,10 @@ func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompl
 		return nil, fmt.Errorf("error creating message: %w", err)
 	}
 
-	message := tg.NewMessage(update.Message.Chat.ID, res.Choices[0].Message.Content)
+	text := res.Choices[0].Message.Content
+
+	message := tg.NewMessage(update.Message.Chat.ID, text)
 	message.ReplyToMessageID = update.Message.MessageID
-	message.ParseMode = "markdown"
 
 	return message, nil
 }
