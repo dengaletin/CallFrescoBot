@@ -86,7 +86,7 @@ func CreateInvoiceUrl(plan string, user *models.User) (string, error) {
 	hash.Write([]byte(join(data, ":")))
 	signature := hex.EncodeToString(hash.Sum(nil))
 
-	baseURL := "https://aaio.io/merchant/pay"
+	baseURL := "https://aaio.so/merchant/pay"
 	params := url.Values{}
 	params.Set("merchant_id", merchantId)
 	params.Set("amount", fmt.Sprintf("%.2f", amount))
