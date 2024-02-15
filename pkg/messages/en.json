@@ -1,11 +1,11 @@
 [
   {
     "id": "StartMsg",
-    "translation": "Hello! \uD83D\uDC4B This is the Telegram bot FrescoAiBot for interacting with the language model ChatGPT and the image generation neural network Dall-E \uD83E\uDD16\n\nIn my free version, you have access to 5\uFE0F⃣ requests per day (they reset every 24 hours). You can increase the number of requests with a monthly subscription:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n\uD83D\uDCB8 Buy subscription /buy\n\n\uD83C\uDF81 I also love giving gifts! You can invite a friend and receive a \"Start\" subscription for 7 days for free. To get a referral link, use the /invite command."
+    "translation": "Hello! \uD83D\uDC4B This is the Telegram bot *FrescoAiBot*. I interact with _ChatGPT_, as well as with the image generation neural network _Dall-E_ \uD83E\uDD16\n\nWhat does this mean?\n\n\uD83D\uDCF2 *ChatGPT mode* works with textual information. You can ask me any question, request to write a congratulatory message or a text for a publication, or develop a plan for any action (content, nutrition, workouts, etc.). I have 2 versions:\n\n▪\uFE0F _GPT-3.5_ — this is an enhanced model after GPT-3, which is one of the most powerful for text generation.\n\n▪\uFE0F _GPT-4_ has an even larger number of parameters than the previous models. It has improved the ability to understand and generate texts, as well as the functionality for tasks that require logical thinking and context recognition.\n\n\uD83C\uDFA8 *Dall-E 3 Mode* generates images upon request. For example, you can ask me to draw a cat playing with a ball, and I will send you a picture in response.\n\n\uD83D\uDCAC *Dialog (context) mode* helps to supplement the request. When the context is activated, I take into account my previous answer and augment it with a new command. For example, you asked me to write a birthday greeting. In the next message, you can specify that the greeting is for your best friend, and I will send an updated version.\n\n\uD83D\uDCAC ❌ If you want to start a dialogue on a new topic, causing the bot to forget the context of the previous conversation, use the command: /forget\n\n\uD83D\uDC49 *Access to the bot:*\n\nIn my free version, you have access to 5\uFE0F⃣ requests per day (they reset every 24 hours). To increase the number of requests and also gain access to _GPT-4_ and _«Dialog» mode_, you can subscribe on a monthly basis:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n*Payment methods:*\n\n\uD83D\uDCB3 Card\n\uD83D\uDCB2 Cryptocurrency\n\n\uD83D\uDCB8 Buy a subscription /buy\n\n\uD83C\uDF81 I also love to give gifts! You can invite a friend and get a free «Start» subscription for 7 days. To get an invitation link, use the command /invite\n\nTo select a mode, click on the button with its name ⬇\uFE0F"
   },
   {
     "id": "BuyMsg",
-    "translation": "\uD83D\uDCB8 Choose a monthly subscription:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n\uD83D\uDCB8 Buy a subscription:"
+    "translation": "\uD83C\uDF1F *More Queries*. With a subscription, you will increase the number of daily requests for the bot. If you use all 5 requests in the free version, with the subscription, you won't have to wait 24 hours for access to be refreshed, and you will be able to continue interacting with the bot.\n\n\uD83C\uDF89 *Access to ChatGPT-4*. With the subscription, you will unlock access to ChatGPT-4 mode. This is an improved model that better understands and generates texts and works with tasks requiring logical thinking and context recognition.\n\n\uD83D\uDCB8 *Choose a monthly subscription*:\n\n✅ Start: 1\uFE0F⃣0\uFE0F⃣ requests per day — $4.5\n✅ Pro: 2\uFE0F⃣0\uFE0F⃣ requests per day — $9.9\n✅ Boss: 5\uFE0F⃣0\uFE0F⃣ requests per day — $19.9\n\n*Payment Methods*:\n\n\uD83D\uDCB3 Card\n\uD83D\uDCB2 Cryptocurrency\n\n*How to Pay?*\n\n1. Select a plan\n2. Click the «Buy» button\n3. Follow the link to our partner's page and select a convenient payment method\n\nBuy Subscription ⬇\uFE0F"
   },
   {
     "id": "ErrorMsg",
@@ -13,7 +13,7 @@
   },
   {
     "id": "StatusMsg",
-    "translation": "\uD83D\uDCCA Subscription Information\n\nYour subscription: %s (%d requests per day)\nAvailable: %d requests\nValid until: %s\nContact: @dendefoe\n\n\uD83C\uDF81 Invite a friend and get a \"Start\" subscription for 7 days for free. To receive a referral link, use the command /invite\n\n\uD83D\uDCB8 Buy a subscription: /buy"
+    "translation": "\uD83D\uDCCA*Subscription Information*\n\nYour subscription: %s (%d requests per day)\nAvailable: %d requests\nValid until: %s\nTechnical support: @dendefoe\n\n\uD83C\uDF81 Invite a friend and get a 7-day «Start» subscription for free. To get your invitation link, use the /invite command.\n\n\uD83D\uDCB8 To upgrade your plan: /buy"
   },
   {
     "id": "UnsupportedMessageType",
@@ -25,35 +25,35 @@
   },
   {
     "id": "SubscriptionPlanFree",
-    "translation": "✅ Free"
+    "translation": "✅ «Free»"
   },
   {
     "id": "SubscriptionPlanStart",
-    "translation": "✅ Start"
+    "translation": "✅ «Start»"
   },
   {
     "id": "SubscriptionPlanPro",
-    "translation": "✅ Pro"
+    "translation": "✅ «Pro»"
   },
   {
     "id": "SubscriptionPlanBoss",
-    "translation": "✅ Boss"
+    "translation": "✅ «Boss»"
   },
   {
     "id": "SubscriptionPlanHacker",
-    "translation": "✅ Hacker"
+    "translation": "✅ «Hacker»"
   },
   {
     "id": "OptionsMessage",
-    "translation": "\uD83D\uDD27 Bot Options\n\nIn this section, you can:\n\n✅ Select the interface language (English/Russian).\n\n\uD83E\uDD16 Choose the ChatGPT mode for working with text information.\nFrescoAiBot offers 2 versions:\n\n- GPT-3.5 — this is an advanced next-generation model after GPT-3 (Generative Pre-trained Transformer 3), which is one of the most powerful models for text generation.\n\n- GPT-4 has a larger number of parameters than GPT-3. It has improved abilities in understanding and generating texts, as well as in tasks that require logical thinking and context recognition.\n\n\uD83C\uDFA8 Choose the Dall-E 3 mode for image generation.\n\n\uD83D\uDCAC Enable or disable context support (dialogue mode). When the context is activated, the bot takes its previous response into account and builds upon it."
+    "translation": "⚙\uFE0F *Bot Settings*\n\nIn this section, you can:\n\n✅ Select the interface language (English/Russian).\n\n✅ Choose the ChatGPT mode for working with text information.\nFrescoAiBot offers 2 versions:\n\n▪\uFE0F GPT-3.5 — this is an advanced next-generation model after GPT-3 (Generative Pre-trained Transformer 3), which is one of the most powerful models for text generation.\n\n▪\uFE0F GPT-4 has even more parameters than the previous models. Its capabilities to understand and generate texts are improved, as well as its performance on tasks that require logical thinking and context recognition.\n\n✅ Choose the Dall-E 3 mode for image generation.\n\n✅ Enable or disable context support (dialogue mode). When the context is activated, the bot takes into account its previous response and complements it with a new command.\n\n\uD83D\uDCF2Technical Support: @dendefoe\n\nTo select a mode, press the button with its name ⬇\uFE0F"
   },
   {
     "id": "RunOutOfMessages",
-    "translation": "\uD83D\uDE25 Sorry, you have run out of messages.\n\nContact: @dendefoe\n\n\uD83C\uDF81 Invite a friend and get a \"Start\" subscription for 7 days for free. To get a referral link, use the /invite command.\n\uD83D\uDCB8 To purchase a subscription: /buy"
+    "translation": "\uD83D\uDE25 Sorry, you have run out of messages.\n\nContact: @dendefoe\n\n\uD83C\uDF81 Invite a friend and get a «Start» subscription for 7 days for free. To get a referral link, use the /invite command.\n\uD83D\uDCB8 To purchase a subscription: /buy"
   },
   {
     "id": "InviteLink",
-    "translation": "\uD83C\uDF81 Invite a friend\n\nInvite a friend via the link and get a \"Start\" subscription for 7 days as a gift:\n\n `https://t.me/call_fresco_bot?start=ref%d`"
+    "translation": "\uD83C\uDF81 *Invite a Friend*\n\nInvite a friend and get a 7-day «Start» subscription as a gift \uD83C\uDF89\n\nTo do this, copy the invitation link and send it to a friend:\n\n➡\uFE0F `https://t.me/call_fresco_bot?start=ref%d`\n\nAfter your friend joins the bot, I will activate your subscription for you and send a notification \uD83D\uDCE9\n\nThe number of invitations is unlimited. Every week you can invite a new friend and get a free subscription \uD83E\uDD29\n\n\uD83D\uDC4B If you have any questions, you can contact technical support: @dendefoe"
   },
   {
     "id": "SuccessRef",

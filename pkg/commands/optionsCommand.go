@@ -21,6 +21,7 @@ func (cmd OptionsCommand) RunCommand() (tg.Chattable, error) {
 
 	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.OptionsMessage))
 	msg.ReplyMarkup = nk
+	msg.ParseMode = "markdown"
 
 	return msg, nil
 }

@@ -36,8 +36,10 @@ func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
 	validDue := SubscriptionValidDue(subscription)
 
 	status := fmt.Sprintf(utils.LocalizeSafe(consts.StatusMsg), subscriptionName, subscription.Limit, remainingMessages, validDue)
+	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, status)
+	msg.ParseMode = "markdown"
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, status), nil
+	return msg, nil
 }
 
 func RemainingMessages(subscriptionLimit int64, messagesCount int64) int64 {

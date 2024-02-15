@@ -20,6 +20,7 @@ func (cmd BuyCommand) RunCommand() (tg.Chattable, error) {
 	nk, err := numericKeyboard.CreateNumericKeyboard("buy", cmd.User, "buy")
 	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.BuyMsg))
 	msg.ReplyMarkup = nk
+	msg.ParseMode = "markdown"
 
 	return msg, nil
 }
