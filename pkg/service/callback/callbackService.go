@@ -139,11 +139,14 @@ func handleLanguage(data QueryData, user *models.User, bot *tgbotapi.BotAPI, que
 		message = utils.LocalizeSafe(consts.OptionsMessage)
 	}
 
-	_, err = bot.Send(tgbotapi.NewEditMessageText(
+	botMsg := tgbotapi.NewEditMessageText(
 		query.Message.Chat.ID,
 		query.Message.MessageID,
 		message,
-	))
+	)
+	botMsg.ParseMode = "markdown"
+
+	_, err = bot.Send(botMsg)
 	if err != nil {
 		return err
 	}
