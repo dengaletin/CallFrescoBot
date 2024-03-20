@@ -120,8 +120,8 @@ func SeedPlans() error {
 	}
 
 	configs := []types.Config{
-		{limits[0], 95, 1},
-		{limits[1], 185, 2},
+		{limits[0], 184, 2},
+		{limits[1], 231, 2.5},
 		{limits[2], 275, 3},
 		{limits[3], 320, 3.50},
 		{limits[4], 549, 6},
