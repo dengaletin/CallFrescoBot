@@ -5,9 +5,13 @@ import (
 	"CallFrescoBot/pkg/models"
 	messageRepository "CallFrescoBot/pkg/repositories/message"
 	userRepository "CallFrescoBot/pkg/repositories/user"
+	planService "CallFrescoBot/pkg/service/plan"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
+	"CallFrescoBot/pkg/types"
 	"CallFrescoBot/pkg/utils"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 	"time"
@@ -27,7 +31,19 @@ func GetOrCreate(user *tgbotapi.User) (*models.User, error) {
 		return nil, err
 	}
 
-	return userRepository.FirstOrCreate(user, db)
+	botUser, err := userRepository.FirstOrCreate(user, db)
+	if err != nil {
+		return nil, err
+	}
+
+	if botUser.IsNew {
+		_, err := subscriptionService.Create(botUser, 3)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return botUser, nil
 }
 
 func ValidateUser(user *models.User) (string, error) {
@@ -43,16 +59,71 @@ func ValidateUser(user *models.User) (string, error) {
 		return "", err
 	}
 
-	limitDate := time.Now().AddDate(0, 0, -1)
-	messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, subscription.Limit, limitDate, db)
-	if err != nil {
-		return "", err
-	}
+	if subscription == nil {
+		return utils.LocalizeSafe(consts.FreeSubscriptionFinish), errors.New("free subscription finish")
+	} else if subscription.PlanId != nil {
+		var usage types.Usage
+		var usageCount int
+		var currentLimit int
+		var config types.Config
 
-	if messagesCount >= int64(subscription.Limit) {
-		return utils.LocalizeSafe(consts.RunOutOfMessages), errors.New("out of messages")
-	}
+		err = json.Unmarshal(subscription.Usage, &usage)
+		if err != nil {
+			return "", fmt.Errorf("error unmarshaling usage JSON: %w", err)
+		}
 
+		userPlan, err := planService.GetPlanById(*subscription.PlanId)
+		if err != nil {
+			return "", fmt.Errorf("can't get subscription plan: %w", err)
+		}
+
+		if err := json.Unmarshal(userPlan.Config, &config); err != nil {
+			return "", err
+		}
+
+		userMode := user.Mode
+
+		if user.Dialog != 0 && !config.Limit.ContextSupport {
+			return "dialog context is not supported in your subscription", errors.New("dialog context is not supported in your subscription")
+		}
+
+		switch userMode {
+		case consts.UsageModeGpt35:
+			if config.Limit.Gpt35Limit <= 0 {
+				return "GPT-3.5 model is not available in your subscription", errors.New("GPT-3.5 model is not available in your subscription")
+			}
+			usageCount = usage.Gpt35 + usage.Gpt35Context
+			currentLimit = config.Limit.Gpt35Limit
+		case consts.UsageModeDalle3:
+			if config.Limit.Dalle3Limit <= 0 {
+				return "DALL-E 3 model is not available in your subscription", errors.New("DALL-E 3 model is not available in your subscription")
+			}
+			usageCount = usage.Dalle3 + usage.Dalle3Context
+			currentLimit = config.Limit.Dalle3Limit
+		case consts.UsageModeGpt4:
+			if config.Limit.Gpt4Limit <= 0 {
+				return "GPT-4 model is not available in your subscription", errors.New("GPT-4 model is not available in your subscription")
+			}
+			usageCount = usage.Gpt4 + usage.Gpt4Context
+			currentLimit = config.Limit.Gpt4Limit
+		default:
+			return "", fmt.Errorf("unknown usage mode: %w", err)
+		}
+
+		if usageCount >= currentLimit {
+			return utils.LocalizeSafe(consts.RunOutOfMessages), errors.New("out of messages")
+		}
+	} else {
+		limitDate := time.Now().AddDate(0, 0, -1)
+		messagesCount, err := messageRepository.CountMessagesByUserAndDate(user, subscription.Limit, limitDate, db)
+		if err != nil {
+			return "", err
+		}
+
+		if messagesCount >= int64(subscription.Limit) {
+			return utils.LocalizeSafe(consts.RunOutOfMessages), errors.New("out of messages")
+		}
+	}
 	return "", nil
 }
 

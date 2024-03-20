@@ -8,7 +8,6 @@ import (
 
 const (
 	StartCommandPattern = `^/start ref[0-9]+$`
-	ModeCommandPattern  = `^/mode[0-9]$`
 )
 
 type CommandRegistryEntry struct {
@@ -18,11 +17,6 @@ type CommandRegistryEntry struct {
 
 var commandRegistry = []CommandRegistryEntry{
 	{Pattern: regexp.MustCompile(StartCommandPattern), Generator: NewRefCommand},
-	{Pattern: regexp.MustCompile(ModeCommandPattern), Generator: NewModeCommand},
-}
-
-func NewModeCommand(update tgbotapi.Update, user *models.User) ICommand {
-	return ModeCommand{BaseCommand{Update: update, User: user}}
 }
 
 func NewStartCommand(update tgbotapi.Update, user *models.User) ICommand {
@@ -77,8 +71,8 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 		return NewStartCommand(update, user)
 	case "/status":
 		return NewStatusCommand(update, user)
-	case "/invite":
-		return NewInviteCommand(update, user)
+	//case "/invite":
+	//	return NewInviteCommand(update, user)
 	case "/buy":
 		return NewBuyCommand(update, user)
 	case "/forget":

@@ -1,7 +1,10 @@
 package subscriptionRepository
 
 import (
+	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
+	"CallFrescoBot/pkg/types"
+	"encoding/json"
 	"errors"
 	"gorm.io/gorm"
 	"time"
@@ -20,10 +23,46 @@ func GetUserSubscription(user *models.User, db *gorm.DB) (*models.Subscription, 
 }
 
 func CreateSubscription(user *models.User, limit int, multiplierDays int, db *gorm.DB) (*models.Subscription, error) {
+	usage := types.Usage{0, 0, 0, 0, 0, 0}
+	usageJSON, err := json.Marshal(usage)
+	if err != nil {
+		return nil, err
+	}
+
+	dateTo := time.Now().AddDate(0, 0, multiplierDays)
+
 	subscription := &models.Subscription{
-		UserId:    user.Id,
-		Limit:     limit,
-		ActiveDue: time.Now().AddDate(0, 0, multiplierDays),
+		UserId:      user.Id,
+		Limit:       limit,
+		ActiveDue:   dateTo,
+		Usage:       usageJSON,
+		RefreshDate: dateTo,
+	}
+
+	result := db.Create(&subscription)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return subscription, nil
+}
+
+func CreateSubscriptionWithPlan(user *models.User, plan *models.Plan, multiplierDays int, db *gorm.DB) (*models.Subscription, error) {
+	usage := types.Usage{0, 0, 0, 0, 0, 0}
+	usageJSON, err := json.Marshal(usage)
+	if err != nil {
+		return nil, err
+	}
+
+	dateTo := time.Now().AddDate(0, 0, multiplierDays)
+
+	subscription := &models.Subscription{
+		UserId:      user.Id,
+		Limit:       consts.NoPlanLimit,
+		PlanId:      &plan.Id,
+		ActiveDue:   dateTo,
+		Usage:       usageJSON,
+		RefreshDate: dateTo,
 	}
 
 	result := db.Create(&subscription)

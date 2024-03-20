@@ -4,11 +4,14 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	"CallFrescoBot/pkg/service/numericKeyboard"
+	planService "CallFrescoBot/pkg/service/plan"
 	subsciptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
+	"CallFrescoBot/pkg/types"
 	"CallFrescoBot/pkg/utils"
 	"encoding/json"
 	"errors"
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strconv"
@@ -181,12 +184,54 @@ func handleMode(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *
 		return subErr
 	}
 
-	if mode == 2 && subscription == nil {
+	if mode != 0 && (subscription == nil || subscription.PlanId == nil) {
 		_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.OnlyForPremium)))
 		if sendErr != nil {
 			return sendErr
 		}
 		return errors.New("only for premium users")
+	}
+
+	if subscription.PlanId != nil {
+		var config types.Config
+
+		userPlan, err := planService.GetPlanById(*subscription.PlanId)
+		if err != nil {
+			return fmt.Errorf("can't get subscription plan: %w", err)
+		}
+
+		if err := json.Unmarshal(userPlan.Config, &config); err != nil {
+			return err
+		}
+
+		switch mode {
+		case consts.UsageModeGpt35:
+			if config.Limit.Gpt35Limit <= 0 {
+				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
+				if sendErr != nil {
+					return sendErr
+				}
+				return errors.New("unavailable in your plan")
+			}
+		case consts.UsageModeDalle3:
+			if config.Limit.Dalle3Limit <= 0 {
+				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
+				if sendErr != nil {
+					return sendErr
+				}
+				return errors.New("unavailable in your plan")
+			}
+		case consts.UsageModeGpt4:
+			if config.Limit.Gpt4Limit <= 0 {
+				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
+				if sendErr != nil {
+					return sendErr
+				}
+				return errors.New("unavailable in your plan")
+			}
+		default:
+			return fmt.Errorf("unknown usage mode: %w", err)
+		}
 	}
 
 	err = userService.SetMode(mode, user)
@@ -235,12 +280,32 @@ func handleContext(data QueryData, user *models.User, bot *tgbotapi.BotAPI, quer
 		return subErr
 	}
 
-	if context == 1 && subscription == nil {
+	if context != 0 && (subscription == nil || subscription.PlanId == nil) {
 		_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.OnlyForPremium)))
 		if sendErr != nil {
 			return sendErr
 		}
 		return errors.New("only for premium users")
+	}
+
+	if subscription.PlanId != nil {
+		var config types.Config
+
+		userPlan, err := planService.GetPlanById(*subscription.PlanId)
+		if err != nil {
+			return fmt.Errorf("can't get subscription plan: %w", err)
+		}
+		if err := json.Unmarshal(userPlan.Config, &config); err != nil {
+			return err
+		}
+
+		if context != 0 && !config.Limit.ContextSupport {
+			_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
+			if sendErr != nil {
+				return sendErr
+			}
+			return errors.New("only for premium users")
+		}
 	}
 
 	err = userService.SetDialogStatus(context, user)

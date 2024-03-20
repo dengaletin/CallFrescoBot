@@ -23,7 +23,7 @@ func (cmd *BaseCommand) Common(validateUser bool) (string, error) {
 
 	err := subsciptionService.ResetSubscription(cmd.User)
 	if err != nil {
-		return "subscription reset error", err
+		return err.Error(), err
 	}
 
 	messageValidatorText, err := messageService.ValidateMessage(cmd.Update.Message.Text)

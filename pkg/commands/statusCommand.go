@@ -4,8 +4,11 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
+	planService "CallFrescoBot/pkg/service/plan"
 	subscriptionService "CallFrescoBot/pkg/service/subsciption"
+	"CallFrescoBot/pkg/types"
 	"CallFrescoBot/pkg/utils"
+	"encoding/json"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"time"
@@ -26,17 +29,59 @@ func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
 		return nil, err
 	}
 
-	subscriptionName := ResolveSubscriptionName(subscription.Limit)
-	messagesCount, err := messageService.CountMessagesByUserAndDate(cmd.User, subscription.Limit, time.Now().AddDate(0, 0, -1))
-	if err != nil {
-		return nil, err
+	var msgText string
+
+	if subscription == nil {
+		msgText = utils.LocalizeSafe(consts.FreeSubscriptionFinish)
+	} else if subscription.PlanId != nil {
+		plan, err := planService.GetPlanById(*subscription.PlanId)
+		if err != nil {
+			return nil, err
+		}
+
+		var usage types.Usage
+
+		err = json.Unmarshal(subscription.Usage, &usage)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshaling usage JSON: %w", err)
+		}
+
+		var config types.Config
+		if err := json.Unmarshal(plan.Config, &config); err != nil {
+			return nil, err
+		}
+
+		limitsInfo := ""
+		if config.Limit.Gpt35Limit > 0 {
+			limitsInfo += fmt.Sprintf("*GPT3.5* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt35+usage.Gpt35Context, config.Limit.Gpt35Limit)
+		}
+		if config.Limit.Gpt4Limit > 0 {
+			limitsInfo += fmt.Sprintf("*GPT4* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt4+usage.Gpt4Context, config.Limit.Gpt4Limit)
+		}
+		if config.Limit.Dalle3Limit > 0 {
+			limitsInfo += fmt.Sprintf("*Dalle3* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Dalle3+usage.Dalle3Context, config.Limit.Dalle3Limit)
+		}
+		contextSupport := utils.LocalizeSafe(consts.No)
+		if config.Limit.ContextSupport {
+			contextSupport = utils.LocalizeSafe(consts.Yes)
+		}
+		limitsInfo += fmt.Sprintf("*"+utils.LocalizeSafe(consts.ContextSupport)+"* - %s\n", contextSupport)
+
+		validDue := SubscriptionValidDue(subscription)
+		msgText = fmt.Sprintf(utils.LocalizeSafe(consts.PlanStatusMsg), plan.Name, limitsInfo, validDue)
+	} else {
+		subscriptionName := ResolveSubscriptionName(subscription.Limit)
+		messagesCount, err := messageService.CountMessagesByUserAndDate(cmd.User, subscription.Limit, time.Now().AddDate(0, 0, -1))
+		if err != nil {
+			return nil, err
+		}
+
+		remainingMessages := RemainingMessages(int64(subscription.Limit), messagesCount)
+		validDue := SubscriptionValidDue(subscription)
+		msgText = fmt.Sprintf(utils.LocalizeSafe(consts.StatusMsg), subscriptionName, subscription.Limit, remainingMessages, validDue)
 	}
 
-	remainingMessages := RemainingMessages(int64(subscription.Limit), messagesCount)
-	validDue := SubscriptionValidDue(subscription)
-
-	status := fmt.Sprintf(utils.LocalizeSafe(consts.StatusMsg), subscriptionName, subscription.Limit, remainingMessages, validDue)
-	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, status)
+	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, msgText)
 	msg.ParseMode = "markdown"
 
 	return msg, nil
@@ -53,25 +98,13 @@ func RemainingMessages(subscriptionLimit int64, messagesCount int64) int64 {
 
 func ResolveSubscriptionName(limit int) string {
 	switch limit := limit; {
-	case limit == 0:
-		return utils.LocalizeSafe(consts.SubscriptionPlanHacker)
-	case limit <= 5:
+	case limit <= consts.NoPlanLimit:
 		return utils.LocalizeSafe(consts.SubscriptionPlanFree)
-	case limit <= 10:
-		return utils.LocalizeSafe(consts.SubscriptionPlanStart)
-	case limit <= 20:
-		return utils.LocalizeSafe(consts.SubscriptionPlanPro)
-	case limit <= 50:
-		return utils.LocalizeSafe(consts.SubscriptionPlanBoss)
 	default:
 		return utils.LocalizeSafe(consts.SubscriptionPlanHacker)
 	}
 }
 
 func SubscriptionValidDue(subscription *models.Subscription) string {
-	if subscription.ActiveDue.IsZero() {
-		return "❌ No active subscriptions"
-	}
-
 	return subscription.ActiveDue.Format("02.01.2006")
 }

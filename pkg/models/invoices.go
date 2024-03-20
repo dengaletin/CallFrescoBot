@@ -10,6 +10,8 @@ type Invoice struct {
 	Amount          float64 `gorm:"not null;index:idx_amount"`
 	Currency        string
 	Coin            int
+	PlanId          *uint64 `gorm:"default:null"`
+	Plan            Plan
 	Status          int64     `gorm:"not null;default:0"`
 	CreatedAt       time.Time `gorm:"autoCreateTime:milli"`
 	UpdatedAt       time.Time `gorm:"autoUpdateTime:milli"`

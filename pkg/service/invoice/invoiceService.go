@@ -4,9 +4,12 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	invoiceRepository "CallFrescoBot/pkg/repositories/invoice"
+	"CallFrescoBot/pkg/types"
 	"CallFrescoBot/pkg/utils"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
 	"net/url"
@@ -51,24 +54,46 @@ func GetInvoice(invoiceId uint64) (*models.Invoice, error) {
 	return invoice, nil
 }
 
-func CreateInvoiceUrl(plan string, user *models.User) (string, error) {
+func CreateInvoiceUrl(plan *models.Plan, user *models.User) (string, error) {
 	db, err := getDBConnection()
 	if err != nil {
 		return "", err
 	}
 
-	amount := resolveAmount(plan)
-	currency := "USD"
-	desc := resolveDescription(plan)
-	lang := resolveLangById(user.Lang)
-	coin := resolveCoin(plan)
+	var price float64
+	var currency string
+	var language string
+	var config types.Config
+	if err := json.Unmarshal(plan.Config, &config); err != nil {
+		return "", err
+	}
+
+	switch user.Lang {
+	case consts.LangEn:
+		price = config.PriceEn
+		language = "en"
+		currency = "USD"
+	case consts.LangRu:
+		price = config.PriceRu
+		language = "ru"
+		currency = "RUB"
+	default:
+		return "", errors.New("unknown language")
+	}
+
+	amount := price
+
+	desc := plan.Name
+	lang := language
+	planId := plan.Id
 
 	invoice, _ := invoiceRepository.InvoiceCreate(
 		1,
 		user.Id,
 		amount,
-		"USD",
-		coin,
+		currency,
+		0,
+		&planId,
 		0,
 		db,
 	)
@@ -112,45 +137,6 @@ func join(slice []string, sep string) string {
 		str += sep + slice[i]
 	}
 	return str
-}
-
-func resolveAmount(plan string) float64 {
-	switch plan {
-	case "1":
-		return 4.5
-	case "2":
-		return 9.9
-	case "3":
-		return 19.9
-	default:
-		return 0
-	}
-}
-
-func resolveDescription(plan string) string {
-	switch plan {
-	case "1":
-		return "Start"
-	case "2":
-		return "Pro"
-	case "3":
-		return "Boss"
-	default:
-		return ""
-	}
-}
-
-func resolveCoin(plan string) int {
-	switch plan {
-	case "1":
-		return 10
-	case "2":
-		return 20
-	case "3":
-		return 50
-	default:
-		return 0
-	}
 }
 
 func resolveLangById(id int64) string {

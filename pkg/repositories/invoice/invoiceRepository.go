@@ -22,6 +22,7 @@ func InvoiceCreate(
 	amount float64,
 	currency string,
 	coin int,
+	planId *uint64,
 	status int64,
 	db *gorm.DB,
 ) (*models.Invoice, error) {
@@ -31,6 +32,7 @@ func InvoiceCreate(
 		Amount:          amount,
 		Currency:        currency,
 		Coin:            coin,
+		PlanId:          planId,
 		Status:          status,
 	}
 	result := db.Create(&newInvoice)

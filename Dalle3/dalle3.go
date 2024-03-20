@@ -4,6 +4,7 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	messageService "CallFrescoBot/pkg/service/message"
+	usageService "CallFrescoBot/pkg/service/usage"
 	"CallFrescoBot/pkg/utils"
 	"context"
 	"encoding/base64"
@@ -39,7 +40,7 @@ func getImageResponse(update tg.Update, user *models.User) (tg.Chattable, error)
 		return nil, err
 	}
 
-	return getMessage(update, imgBytes, user.Id)
+	return getMessage(update, imgBytes, user)
 }
 
 func getImageBytes(
@@ -86,12 +87,22 @@ func prepareRequest(promptText string, user *models.User) openai.ImageRequest {
 	}
 }
 
-func getMessage(update tg.Update, imgBytes []byte, userID uint64) (tg.Chattable, error) {
+func getMessage(update tg.Update, imgBytes []byte, user *models.User) (tg.Chattable, error) {
 	file := createFile("image.jpg", imgBytes)
-	err := messageService.CreateMessage(userID, update.Message.Text, "image.jpg", 1)
-
+	err := messageService.CreateMessage(user.Id, update.Message.Text, "image.jpg", user.Mode)
 	if err != nil {
 		return nil, err
+	}
+
+	userMode := user.Mode
+
+	if user.Dialog == 1 {
+		userMode = userMode + 100
+	}
+
+	err = usageService.SaveUsage(user, userMode)
+	if err != nil {
+		return nil, fmt.Errorf("error saving usage: %w", err)
 	}
 
 	message := createMessage(update, file)

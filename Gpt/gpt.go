@@ -4,6 +4,7 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	"CallFrescoBot/pkg/service/message"
+	usageService "CallFrescoBot/pkg/service/usage"
 	"CallFrescoBot/pkg/utils"
 	"context"
 	"errors"
@@ -22,9 +23,20 @@ func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest)
 }
 
 func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompletionResponse) (tg.Chattable, error) {
-	err := messageService.CreateMessage(user.Id, update.Message.Text, res.Choices[0].Message.Content, 0)
+	err := messageService.CreateMessage(user.Id, update.Message.Text, res.Choices[0].Message.Content, user.Mode)
 	if err != nil {
 		return nil, fmt.Errorf("error creating message: %w", err)
+	}
+
+	userMode := user.Mode
+
+	if user.Dialog == 1 {
+		userMode = userMode + 100
+	}
+
+	err = usageService.SaveUsage(user, userMode)
+	if err != nil {
+		return nil, fmt.Errorf("error saving usage: %w", err)
 	}
 
 	text := res.Choices[0].Message.Content
@@ -61,7 +73,7 @@ func createRequest(user *models.User, update tg.Update, model string) openai.Cha
 	var messages []openai.ChatCompletionMessage
 
 	if user.Dialog == 1 {
-		userMessages, err := messageService.GetMessagesByUser(user, 15, 0)
+		userMessages, err := messageService.GetMessagesByUser(user, 15, user.Mode)
 		if err != nil {
 			log.Printf("error getting messages by user: %v", err)
 		}

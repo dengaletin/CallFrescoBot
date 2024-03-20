@@ -4,11 +4,14 @@ import (
 	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	payService "CallFrescoBot/pkg/service/invoice"
+	planService "CallFrescoBot/pkg/service/plan"
+	"CallFrescoBot/pkg/types"
 	"CallFrescoBot/pkg/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"log"
 	"strconv"
 )
 
@@ -49,10 +52,10 @@ func CreateMainMenu() error {
 			Command:     "/buy",
 			Description: utils.LocalizeSafe(consts.BuyCommandDescription),
 		},
-		tg.BotCommand{
-			Command:     "/invite",
-			Description: utils.LocalizeSafe(consts.InviteCommandDescription),
-		},
+		//tg.BotCommand{
+		//	Command:     "/invite",
+		//	Description: utils.LocalizeSafe(consts.InviteCommandDescription),
+		//},
 		tg.BotCommand{
 			Command:     "/options",
 			Description: utils.LocalizeSafe(consts.OptionsCommandDescription),
@@ -185,15 +188,43 @@ func createButtonBack(text string, extra string) tg.InlineKeyboardButton {
 }
 
 func createBuyKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
-	startButton := createBuyButton(utils.LocalizeSafe(consts.BuyPlan1), "1")
-	vipButton := createBuyButton(utils.LocalizeSafe(consts.BuyPlan2), "2")
-	bossButton := createBuyButton(utils.LocalizeSafe(consts.BuyPlan3), "3")
+	plans, err := planService.GetAllPlans()
+	if err != nil {
+		log.Println("Failed to fetch plans:", err)
+		return nil
+	}
 
-	keyboard := tg.NewInlineKeyboardMarkup(
-		tg.NewInlineKeyboardRow(startButton),
-		tg.NewInlineKeyboardRow(vipButton),
-		tg.NewInlineKeyboardRow(bossButton),
-	)
+	var rows [][]tg.InlineKeyboardButton  // Сохраняем ряды кнопок
+	var tempRow []tg.InlineKeyboardButton // Временная переменная для единого ряда
+
+	for i, p := range plans {
+		var config types.Config
+		err := json.Unmarshal(p.Config, &config)
+		if err != nil {
+			log.Println("Failed to unmarshal plan config:", err)
+			continue
+		}
+
+		currencySign := "$"
+		planPrice := config.PriceEn
+		if user.Lang == consts.LangRu {
+			planPrice = config.PriceRu
+			currencySign = "₽"
+		}
+
+		planName := p.Name
+		buttonText := planName + " - " + currencySign + strconv.FormatFloat(planPrice, 'f', 2, 64)
+
+		button := createBuyButton(buttonText, strconv.FormatUint(p.Id, 10))
+
+		tempRow = append(tempRow, button)      // Добавляем кнопку в временный ряд
+		if (i+1)%2 == 0 || i == len(plans)-1 { // Проверяем, если у нас две кнопки, или если это последний элемент
+			rows = append(rows, tg.NewInlineKeyboardRow(tempRow...)) // Добавляем временный ряд в rows
+			tempRow = []tg.InlineKeyboardButton{}                    // Сбрасываем временный ряд для следующих кнопок
+		}
+	}
+
+	keyboard := tg.NewInlineKeyboardMarkup(rows...) // Создаем клавиатуру из всех рядов
 
 	return &keyboard
 }
@@ -209,12 +240,28 @@ func createBuyButton(text string, extra string) tg.InlineKeyboardButton {
 }
 
 func createBuyLinkKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
-	url, err := payService.CreateInvoiceUrl(extra, user)
+	planID, err := strconv.ParseUint(extra, 10, 64)
 	if err != nil {
-		// log error
+		log.Println("Failed parse plan", err)
+		return nil
 	}
 
-	urlButton := tg.NewInlineKeyboardButtonURL(resolvePlanName(extra), url)
+	plan, err := planService.GetPlanById(planID)
+	if err != nil {
+		log.Println("Failed get plan", err)
+		return nil
+	}
+
+	url, err := payService.CreateInvoiceUrl(plan, user)
+	if err != nil {
+		log.Println("Failed to create invoice:", err)
+
+		return nil
+	}
+
+	buttonText := utils.LocalizeSafe(consts.Buy) + " " + plan.Name
+
+	urlButton := tg.NewInlineKeyboardButtonURL(buttonText, url)
 	backButton := createButtonBuyBack(utils.LocalizeSafe(consts.BackButton), "")
 
 	keyboard := tg.NewInlineKeyboardMarkup(
@@ -223,19 +270,6 @@ func createBuyLinkKeyboard(user *models.User, extra string) *tg.InlineKeyboardMa
 	)
 
 	return &keyboard
-}
-
-func resolvePlanName(plan string) string {
-	switch plan {
-	case "1":
-		return utils.LocalizeSafe(consts.BuyPlan1)
-	case "2":
-		return utils.LocalizeSafe(consts.BuyPlan2)
-	case "3":
-		return utils.LocalizeSafe(consts.BuyPlan3)
-	default:
-		return ""
-	}
 }
 
 func createButtonBuyBack(text string, extra string) tg.InlineKeyboardButton {

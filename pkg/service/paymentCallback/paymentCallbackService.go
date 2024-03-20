@@ -3,6 +3,7 @@ package paymentCallbackService
 import (
 	"CallFrescoBot/pkg/consts"
 	payService "CallFrescoBot/pkg/service/invoice"
+	planService "CallFrescoBot/pkg/service/plan"
 	subsciptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	"CallFrescoBot/pkg/utils"
@@ -83,7 +84,13 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	_, err = subsciptionService.Create(user, invoice.Coin)
+
+	plan, err := planService.GetPlanById(*invoice.PlanId)
+	if err != nil {
+		return
+	}
+
+	_, err = subsciptionService.CreateWithPlan(user, plan)
 
 	bot := utils.GetBot()
 	msg := tg.NewMessage(user.TgId, utils.LocalizeSafe(consts.SubscriptionSuccess))
@@ -92,5 +99,8 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintln(w, "OK")
+	_, err = fmt.Fprintln(w, "OK")
+	if err != nil {
+		return
+	}
 }

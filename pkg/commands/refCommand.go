@@ -2,8 +2,6 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
-	messageService "CallFrescoBot/pkg/service/message"
-	subscriptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	userRefService "CallFrescoBot/pkg/service/userRef"
 	"CallFrescoBot/pkg/utils"
@@ -45,14 +43,16 @@ func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
 		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
 	}
 
-	if _, err = subscriptionService.GetOrCreate(referringUser, 10, consts.RefDaysMultiplier); err != nil {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
-	}
+	/*
+		if _, err = subscriptionService.GetOrCreate(referringUser, 10, consts.RefDaysMultiplier); err != nil {
+			return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
+		}
 
-	err = messageService.SendMsgToUser(referringUser.TgId, utils.LocalizeSafe(consts.SuccessRef))
-	if err != nil {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
-	}
+		err = messageService.SendMsgToUser(referringUser.TgId, utils.LocalizeSafe(consts.SuccessRef))
+		if err != nil {
+			return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
+		}
+	*/
 
 	return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), nil
 }

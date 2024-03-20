@@ -35,6 +35,10 @@ func createResources() error {
 		return errors.Wrap(err, "Failed to auto-migrate database")
 	}
 
+	if err := utils.SeedPlans(); err != nil {
+		return errors.Wrap(err, "Failed to seed plans")
+	}
+
 	if err := utils.CreateBot(); err != nil {
 		return errors.Wrap(err, "Failed to create bot")
 	}
