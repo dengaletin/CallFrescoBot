@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -93,9 +94,16 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = subsciptionService.CreateWithPlan(user, plan)
 
 	bot := utils.GetBot()
-	msg := tg.NewMessage(user.TgId, utils.LocalizeSafe(consts.SubscriptionSuccess))
-	_, err = bot.Send(msg)
-	if err != nil {
+
+	utils.InitBundle(user.Lang)
+
+	successText := utils.LocalizeSafe(consts.SubscriptionSuccess)
+	if err := sendMessage(bot, user.TgId, successText); err != nil {
+		return
+	}
+
+	infoText := fmt.Sprintf("New subscription! [UserId: %d, Amount: %s] PlanId: %d", user.Id, postedAmount+postedCurrency, plan.Id)
+	if err := sendMessage(bot, consts.LogErrorRecipient, infoText); err != nil {
 		return
 	}
 
@@ -103,4 +111,15 @@ func PaymentCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+}
+
+func sendMessage(bot *tg.BotAPI, chatID int64, text string) error {
+	msg := tg.NewMessage(chatID, text)
+	_, err := bot.Send(msg)
+	if err != nil {
+		log.Printf("Error sending message: %v\n", err)
+		return err
+	}
+
+	return nil
 }
