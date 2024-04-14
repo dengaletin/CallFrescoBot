@@ -59,6 +59,10 @@ func NewGpt4Command(update tgbotapi.Update, user *models.User) ICommand {
 	return Gpt4Command{BaseCommand{Update: update, User: user}}
 }
 
+func NewClaudeCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return ClaudeCommand{BaseCommand{Update: update, User: user}}
+}
+
 func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 	for _, entry := range commandRegistry {
 		if entry.Pattern.MatchString(update.Message.Text) {
@@ -85,6 +89,9 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 		}
 		if user.Mode == 2 {
 			return NewGpt4Command(update, user)
+		}
+		if user.Mode == 3 {
+			return NewClaudeCommand(update, user)
 		}
 		return NewGptCommand(update, user)
 	}

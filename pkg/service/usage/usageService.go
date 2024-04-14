@@ -34,6 +34,10 @@ func SaveUsage(user *models.User, modeId int64) error {
 		usage.Dalle3Context += 1
 	case consts.UsageModeGpt4Context:
 		usage.Gpt4Context += 1
+	case consts.UsageModeClaude:
+		usage.Claude += 1
+	case consts.UsageModeClaudeContext:
+		usage.ClaudeContext += 1
 	default:
 		return fmt.Errorf("unknown usage mode: %w", err)
 	}

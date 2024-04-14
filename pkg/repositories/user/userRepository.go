@@ -66,7 +66,7 @@ func GetUserById(id uint64, db *gorm.DB) (*models.User, error) {
 }
 
 func SetMode(mode int64, user *models.User, db *gorm.DB) error {
-	modes := []int64{0, 1, 2}
+	modes := []int64{0, 1, 2, 3}
 	modeStatus := slices.Contains(modes, mode)
 
 	if modeStatus == false {

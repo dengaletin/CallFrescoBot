@@ -106,6 +106,12 @@ func ValidateUser(user *models.User) (string, error) {
 			}
 			usageCount = usage.Gpt4 + usage.Gpt4Context
 			currentLimit = config.Limit.Gpt4Limit
+		case consts.UsageModeClaude:
+			if config.Limit.ClaudeLimit <= 0 {
+				return "Claude model is not available in your subscription", errors.New("Claude model is not available in your subscription")
+			}
+			usageCount = usage.Claude + usage.ClaudeContext
+			currentLimit = config.Limit.ClaudeLimit
 		default:
 			return "", fmt.Errorf("unknown usage mode: %w", err)
 		}

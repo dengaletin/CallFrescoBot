@@ -89,6 +89,40 @@ func AutoMigrateDB() error {
 	return err
 }
 
+func ClaudeUpdate() error {
+	var subscriptions []models.Subscription
+	err := dbConn.Find(&subscriptions).Error
+	if err != nil {
+		return err
+	}
+
+	for _, sub := range subscriptions {
+		usage := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(sub.Usage), &usage); err != nil {
+			return err
+		}
+
+		if _, exists := usage["claude"]; !exists {
+			usage["claude"] = 0
+		}
+		if _, exists := usage["claude_context"]; !exists {
+			usage["claude_context"] = 0
+		}
+
+		updatedUsageJSON, err := json.Marshal(usage)
+		if err != nil {
+			return err
+		}
+
+		err = dbConn.Model(&models.Subscription{}).Where("id = ?", sub.Id).Update("usage", updatedUsageJSON).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func SeedPlans() error {
 	db, connErr := GetDatabaseConnection()
 	if connErr != nil {
@@ -103,20 +137,20 @@ func SeedPlans() error {
 	}
 
 	limits := []types.Limit{
-		{Gpt35Limit: 100, Gpt4Limit: 0, Dalle3Limit: 0, ContextSupport: false},
-		{Gpt35Limit: 500, Gpt4Limit: 0, Dalle3Limit: 0, ContextSupport: false},
-		{Gpt35Limit: 100, Gpt4Limit: 0, Dalle3Limit: 0, ContextSupport: true},
-		{Gpt35Limit: 1000, Gpt4Limit: 0, Dalle3Limit: 0, ContextSupport: false},
-		{Gpt35Limit: 500, Gpt4Limit: 0, Dalle3Limit: 0, ContextSupport: true},
-		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 0, ContextSupport: false},
-		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 10, ContextSupport: false},
-		{Gpt35Limit: 1000, Gpt4Limit: 0, Dalle3Limit: 0, ContextSupport: true},
-		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 0, ContextSupport: true},
-		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 10, ContextSupport: true},
-		{Gpt35Limit: 500, Gpt4Limit: 500, Dalle3Limit: 0, ContextSupport: false},
-		{Gpt35Limit: 500, Gpt4Limit: 500, Dalle3Limit: 50, ContextSupport: false},
-		{Gpt35Limit: 1000, Gpt4Limit: 1000, Dalle3Limit: 0, ContextSupport: false},
-		{Gpt35Limit: 1000, Gpt4Limit: 1000, Dalle3Limit: 100, ContextSupport: false},
+		{Gpt35Limit: 100, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 100, ContextSupport: false},
+		{Gpt35Limit: 500, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 500, ContextSupport: false},
+		{Gpt35Limit: 100, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 100, ContextSupport: true},
+		{Gpt35Limit: 1000, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: false},
+		{Gpt35Limit: 500, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: true},
+		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: false},
+		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 10, ClaudeLimit: 0, ContextSupport: false},
+		{Gpt35Limit: 1000, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: true},
+		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: true},
+		{Gpt35Limit: 100, Gpt4Limit: 100, Dalle3Limit: 10, ClaudeLimit: 0, ContextSupport: true},
+		{Gpt35Limit: 500, Gpt4Limit: 500, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: false},
+		{Gpt35Limit: 500, Gpt4Limit: 500, Dalle3Limit: 50, ClaudeLimit: 0, ContextSupport: false},
+		{Gpt35Limit: 1000, Gpt4Limit: 1000, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: false},
+		{Gpt35Limit: 1000, Gpt4Limit: 1000, Dalle3Limit: 100, ClaudeLimit: 0, ContextSupport: false},
 	}
 
 	configs := []types.Config{

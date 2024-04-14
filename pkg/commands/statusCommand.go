@@ -61,6 +61,9 @@ func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
 		if config.Limit.Dalle3Limit > 0 {
 			limitsInfo += fmt.Sprintf("*Dalle3* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Dalle3+usage.Dalle3Context, config.Limit.Dalle3Limit)
 		}
+		if config.Limit.ClaudeLimit > 0 {
+			limitsInfo += fmt.Sprintf("*Claude* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Claude+usage.ClaudeContext, config.Limit.ClaudeLimit)
+		}
 		contextSupport := utils.LocalizeSafe(consts.No)
 		if config.Limit.ContextSupport {
 			contextSupport = utils.LocalizeSafe(consts.Yes)

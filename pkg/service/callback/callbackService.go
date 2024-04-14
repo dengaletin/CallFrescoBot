@@ -229,6 +229,14 @@ func handleMode(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *
 				}
 				return errors.New("unavailable in your plan")
 			}
+		case consts.UsageModeClaude:
+			if config.Limit.ClaudeLimit <= 0 {
+				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
+				if sendErr != nil {
+					return sendErr
+				}
+				return errors.New("unavailable in your plan")
+			}
 		default:
 			return fmt.Errorf("unknown usage mode: %w", err)
 		}

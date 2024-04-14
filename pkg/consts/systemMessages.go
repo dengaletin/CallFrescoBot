@@ -34,6 +34,7 @@ const (
 	StatusCommandDescription  = "StatusCommandDescription"
 	SubscriptionSuccess       = "SubscriptionSuccess"
 	GptLoading                = "GptLoading"
+	ClaudeLoading             = "ClaudeLoading"
 	DalleLoading              = "DalleLoading"
 	UnavailableInYourPlan     = "UnavailableInYourPlan"
 	Requests                  = "Requests"

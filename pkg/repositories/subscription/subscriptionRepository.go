@@ -23,7 +23,7 @@ func GetUserSubscription(user *models.User, db *gorm.DB) (*models.Subscription, 
 }
 
 func CreateSubscription(user *models.User, limit int, multiplierDays int, db *gorm.DB) (*models.Subscription, error) {
-	usage := types.Usage{0, 0, 0, 0, 0, 0}
+	usage := types.Usage{0, 0, 0, 0, 0, 0, 0, 0}
 	usageJSON, err := json.Marshal(usage)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func CreateSubscription(user *models.User, limit int, multiplierDays int, db *go
 }
 
 func CreateSubscriptionWithPlan(user *models.User, plan *models.Plan, multiplierDays int, db *gorm.DB) (*models.Subscription, error) {
-	usage := types.Usage{0, 0, 0, 0, 0, 0}
+	usage := types.Usage{0, 0, 0, 0, 0, 0, 0, 0}
 	usageJSON, err := json.Marshal(usage)
 	if err != nil {
 		return nil, err
