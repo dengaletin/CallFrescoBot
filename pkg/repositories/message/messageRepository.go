@@ -1,6 +1,7 @@
 package messageRepository
 
 import (
+	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	"errors"
 	"fmt"
@@ -38,13 +39,16 @@ func CountMessagesByUserAndDate(user *models.User, limit int, date time.Time, db
 
 func GetMessagesByUser(user *models.User, limit int, mode int64, db *gorm.DB) ([]models.Message, error) {
 	var messages []models.Message
+	var rawSQL string
 
-	rawSQL := fmt.Sprintf(
-		"(SELECT * FROM messages WHERE user_id = %d AND id > %d AND mode = %d ORDER BY created_at DESC LIMIT %d) AS subquery",
-		user.Id, user.DialogFromId, mode, limit,
-	)
+	baseSQL := "SELECT * FROM messages WHERE user_id = %d AND id > %d AND mode = %d"
 
-	err := db.Raw("SELECT * FROM " + rawSQL + " ORDER BY id ASC").Scan(&messages).Error
+	if user.Id == consts.AdminUserId {
+		rawSQL = fmt.Sprintf(baseSQL+" ORDER BY created_at DESC LIMIT %d", user.Id, user.DialogFromId, mode, limit)
+	} else {
+		rawSQL = fmt.Sprintf(baseSQL+" AND created_at >= NOW() - INTERVAL 1 HOUR ORDER BY created_at DESC LIMIT %d", user.Id, user.DialogFromId, mode, limit)
+	}
+	err := db.Raw("SELECT * FROM (" + rawSQL + ") AS subquery ORDER BY id ASC").Scan(&messages).Error
 	if err != nil {
 		return nil, err
 	}

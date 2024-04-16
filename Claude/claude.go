@@ -54,7 +54,7 @@ func GetResponse(update tg.Update, user *models.User) (tg.Chattable, error) {
 	var messages []anthropic.Message
 
 	if user.Dialog == 1 {
-		userMessages, err := messageService.GetMessagesByUser(user, 15, user.Mode)
+		userMessages, err := messageService.GetMessagesByUser(user, consts.ContextMessagesLimit, user.Mode)
 		if err != nil {
 			log.Printf("error getting messages by user: %v", err)
 		}

@@ -64,7 +64,7 @@ func prepareRequest(promptText string, user *models.User) openai.ImageRequest {
 	var messages []string
 
 	if user.Dialog == 1 {
-		userMessages, err := messageService.GetMessagesByUser(user, 15, 1)
+		userMessages, err := messageService.GetMessagesByUser(user, consts.ContextMessagesLimit, 1)
 		if err != nil {
 			log.Printf("error getting messages by user: %v", err)
 		} else {

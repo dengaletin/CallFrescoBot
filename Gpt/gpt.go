@@ -73,7 +73,13 @@ func createRequest(user *models.User, update tg.Update, model string) openai.Cha
 	var messages []openai.ChatCompletionMessage
 
 	if user.Dialog == 1 {
-		userMessages, err := messageService.GetMessagesByUser(user, 15, user.Mode)
+		contextMessagesLimit := consts.ContextMessagesLimit
+
+		if user.Id == consts.AdminUserId {
+			contextMessagesLimit = consts.AdminContextMessagesLimit
+		}
+
+		userMessages, err := messageService.GetMessagesByUser(user, contextMessagesLimit, user.Mode)
 		if err != nil {
 			log.Printf("error getting messages by user: %v", err)
 		}
