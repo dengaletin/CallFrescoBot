@@ -37,7 +37,7 @@ func GetOrCreate(user *tgbotapi.User) (*models.User, error) {
 	}
 
 	if botUser.IsNew {
-		_, err := subscriptionService.Create(botUser, 3)
+		_, err := subscriptionService.Create(botUser, consts.NoPlanLimit)
 		if err != nil {
 			return nil, err
 		}
