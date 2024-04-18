@@ -210,20 +210,20 @@ func createBuyKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup
 
 		currencySign := "$"
 		planPrice := config.PriceEn
-		if user.Lang == consts.LangRu {
-			planPrice = config.PriceRu
-			currencySign = "₽"
-		}
+		//if user.Lang == consts.LangRu {
+		//	planPrice = config.PriceRu
+		//	currencySign = "₽"
+		//}
 
 		planName := p.Name
 		buttonText := planName + " - " + currencySign + strconv.FormatFloat(planPrice, 'f', 2, 64)
 
 		button := createBuyButton(buttonText, strconv.FormatUint(p.Id, 10))
 
-		tempRow = append(tempRow, button)      // Добавляем кнопку в временный ряд
-		if (i+1)%2 == 0 || i == len(plans)-1 { // Проверяем, если у нас две кнопки, или если это последний элемент
-			rows = append(rows, tg.NewInlineKeyboardRow(tempRow...)) // Добавляем временный ряд в rows
-			tempRow = []tg.InlineKeyboardButton{}                    // Сбрасываем временный ряд для следующих кнопок
+		tempRow = append(tempRow, button)
+		if (i+1)%2 == 0 || i == len(plans)-1 {
+			rows = append(rows, tg.NewInlineKeyboardRow(tempRow...))
+			tempRow = []tg.InlineKeyboardButton{}
 		}
 	}
 

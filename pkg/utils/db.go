@@ -132,6 +132,47 @@ func SeedPlans() error {
 	var count int64
 	db.Model(&models.Plan{}).Count(&count)
 
+	if count == 14 {
+		limits := []types.Limit{
+			{Gpt35Limit: 300, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: false},
+			{Gpt35Limit: 100, Gpt4Limit: 0, Dalle3Limit: 0, ClaudeLimit: 0, ContextSupport: true},
+			{Gpt35Limit: 200, Gpt4Limit: 0, Dalle3Limit: 50, ClaudeLimit: 0, ContextSupport: false},
+			{Gpt35Limit: 300, Gpt4Limit: 150, Dalle3Limit: 10, ClaudeLimit: 0, ContextSupport: false},
+		}
+
+		configs := []types.Config{
+			{limits[0], 0, 2},
+			{limits[1], 0, 4},
+			{limits[2], 0, 6},
+			{limits[3], 0, 12},
+		}
+
+		var PlanNames = []string{
+			consts.Plan15Name,
+			consts.Plan16Name,
+			consts.Plan17Name,
+			consts.Plan18Name,
+		}
+
+		for index, config := range configs {
+			configJSON, err := json.Marshal(config)
+			if err != nil {
+				return err
+			}
+
+			plan := models.Plan{
+				Name:   PlanNames[index],
+				Config: configJSON,
+			}
+
+			if err := db.Create(&plan).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
 	if count > 0 {
 		return nil
 	}

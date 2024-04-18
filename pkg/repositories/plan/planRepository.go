@@ -21,7 +21,7 @@ func GetPlanById(planId uint64, db *gorm.DB) (*models.Plan, error) {
 func GetAllPlans(db *gorm.DB) ([]*models.Plan, error) {
 	var plans []*models.Plan
 
-	result := db.Find(&plans)
+	result := db.Where("is_active = 1").Find(&plans)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {

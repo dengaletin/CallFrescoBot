@@ -15,4 +15,8 @@ const (
 	Plan12Name = "Sun"
 	Plan13Name = "Zen"
 	Plan14Name = "God"
+	Plan15Name = "Zone"
+	Plan16Name = "Brain"
+	Plan17Name = "Swift"
+	Plan18Name = "Echo"
 )
