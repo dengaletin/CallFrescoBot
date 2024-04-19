@@ -84,6 +84,8 @@ func AutoMigrateDB() error {
 		&models.UserRef{},
 		&models.Invoice{},
 		&models.Plan{},
+		&models.Promo{},
+		&models.Campaign{},
 	)
 
 	return err

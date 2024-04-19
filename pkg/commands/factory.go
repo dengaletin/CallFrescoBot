@@ -8,6 +8,7 @@ import (
 
 const (
 	StartCommandPattern = `^/start ref[0-9]+$`
+	PromoCommandPattern = `^/start [A-Za-z]+$`
 )
 
 type CommandRegistryEntry struct {
@@ -17,6 +18,7 @@ type CommandRegistryEntry struct {
 
 var commandRegistry = []CommandRegistryEntry{
 	{Pattern: regexp.MustCompile(StartCommandPattern), Generator: NewRefCommand},
+	{Pattern: regexp.MustCompile(PromoCommandPattern), Generator: NewPromoCommand},
 }
 
 func NewStartCommand(update tgbotapi.Update, user *models.User) ICommand {
@@ -37,6 +39,10 @@ func NewOptionsCommand(update tgbotapi.Update, user *models.User) ICommand {
 
 func NewInviteCommand(update tgbotapi.Update, user *models.User) ICommand {
 	return InviteCommand{BaseCommand{Update: update, User: user}}
+}
+
+func NewPromoCommand(update tgbotapi.Update, user *models.User) ICommand {
+	return PromoCommand{BaseCommand{Update: update, User: user}}
 }
 
 func NewBuyCommand(update tgbotapi.Update, user *models.User) ICommand {
