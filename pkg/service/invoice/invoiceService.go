@@ -74,9 +74,9 @@ func CreateInvoiceUrl(plan *models.Plan, user *models.User) (string, error) {
 		language = "en"
 		currency = "USD"
 	case consts.LangRu:
-		price = config.PriceRu
+		price = config.PriceEn
 		language = "ru"
-		currency = "RUB"
+		currency = "USD"
 	default:
 		return "", errors.New("unknown language")
 	}
