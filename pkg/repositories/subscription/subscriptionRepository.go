@@ -73,6 +73,30 @@ func CreateSubscriptionWithPlan(user *models.User, plan *models.Plan, multiplier
 	return subscription, nil
 }
 
+func RefreshSubscription(subscription *models.Subscription, db *gorm.DB) (*models.Subscription, error) {
+	newUsage := types.Usage{}
+	newUsageJson, err := json.Marshal(newUsage)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshedSubscription := &models.Subscription{
+		UserId:      subscription.UserId,
+		Limit:       consts.NoPlanLimit,
+		PlanId:      subscription.PlanId,
+		ActiveDue:   subscription.ActiveDue,
+		Usage:       newUsageJson,
+		RefreshDate: subscription.RefreshDate,
+	}
+
+	result := db.Create(&refreshedSubscription)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return refreshedSubscription, nil
+}
+
 func UpdateSubscription(subscription *models.Subscription, db *gorm.DB) (*models.Subscription, error) {
 	result := db.Save(subscription)
 	if result.Error != nil {

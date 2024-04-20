@@ -1,12 +1,11 @@
 package subsciptionService
 
 import (
+	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	subscriptionRepository "CallFrescoBot/pkg/repositories/subscription"
 	userRepository "CallFrescoBot/pkg/repositories/user"
-	"CallFrescoBot/pkg/types"
 	"CallFrescoBot/pkg/utils"
-	"encoding/json"
 	"errors"
 	"gorm.io/gorm"
 	"time"
@@ -77,16 +76,9 @@ func ResetSubscription(user *models.User) error {
 	}
 
 	if currentDate.Equal(refreshDate) {
-		newUsage := types.Usage{}
-		newUsageJson, err := json.Marshal(newUsage)
-		if err != nil {
-			return err
-		}
+		subscription.RefreshDate = currentDate.AddDate(0, 0, consts.SubscriptionMultiplierDays)
 
-		subscription.Usage = newUsageJson
-		subscription.RefreshDate = currentDate.AddDate(0, 0, 30)
-
-		if _, err := subscriptionRepository.UpdateSubscription(subscription, db); err != nil {
+		if _, err := subscriptionRepository.RefreshSubscription(subscription, db); err != nil {
 			return err
 		}
 	}
@@ -109,7 +101,7 @@ func Create(user *models.User, limit int) (*models.Subscription, error) {
 	}
 
 	var subscription *models.Subscription
-	subscription, err = subscriptionRepository.CreateSubscription(user, limit, 30, db)
+	subscription, err = subscriptionRepository.CreateSubscription(user, limit, consts.SubscriptionMultiplierDays, db)
 
 	return subscription, nil
 }
@@ -121,34 +113,7 @@ func CreateWithPlan(user *models.User, plan *models.Plan) (*models.Subscription,
 	}
 
 	var subscription *models.Subscription
-	subscription, err = subscriptionRepository.CreateSubscriptionWithPlan(user, plan, 30, db)
-
-	return subscription, nil
-}
-
-func GetOrCreate(user *models.User, limit int, daysMultiplier int) (*models.Subscription, error) {
-	db, err := getDBConnection()
-	if err != nil {
-		return nil, err
-	}
-
-	var subscription *models.Subscription
-
-	subscription, err = getSubscription(user, db)
-	if err != nil {
-		return nil, err
-	}
-
-	if subscription == nil {
-		subscription, err = subscriptionRepository.CreateSubscription(user, limit, daysMultiplier, db)
-	} else {
-		if subscription.Limit > limit {
-			return nil, errors.New("subscription is too cool")
-		}
-
-		subscription.ActiveDue = subscription.ActiveDue.AddDate(0, 0, daysMultiplier)
-		subscription, err = subscriptionRepository.UpdateSubscription(subscription, db)
-	}
+	subscription, err = subscriptionRepository.CreateSubscriptionWithPlan(user, plan, consts.SubscriptionMultiplierDays, db)
 
 	return subscription, nil
 }
