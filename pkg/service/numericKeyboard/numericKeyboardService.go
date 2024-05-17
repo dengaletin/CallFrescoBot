@@ -105,8 +105,8 @@ func createLanguageKeyboard(user *models.User, extra string) *tg.InlineKeyboardM
 func createMainKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
 	chatGPTButton := createButtonWithMode("GPT3.5", extra, user.Mode, ModeChatGPT35)
 	dalleButton := createButtonWithMode("DallE3", extra, user.Mode, ModeDallE)
-	chatGPT4Button := createButtonWithMode("GPT4", extra, user.Mode, ModeChatGPT4)
-	claudeButton := createButtonWithMode("Claude", extra, user.Mode, Claude)
+	chatGPT4Button := createButtonWithMode("GPT4-Omni", extra, user.Mode, ModeChatGPT4)
+	claudeButton := createButtonWithMode("Claude (coming soon)", extra, user.Mode, Claude)
 	contextButton := createButtonWithContext(utils.LocalizeSafe(consts.ContextSupportButton), extra, user.Dialog)
 	languageButton := createButtonWithLanguage(utils.LocalizeSafe(consts.LanguageSelectButton), extra)
 
