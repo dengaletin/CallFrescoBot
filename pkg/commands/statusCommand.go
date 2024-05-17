@@ -56,7 +56,7 @@ func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
 			limitsInfo += fmt.Sprintf("*GPT3.5* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt35+usage.Gpt35Context, config.Limit.Gpt35Limit)
 		}
 		if config.Limit.Gpt4Limit > 0 {
-			limitsInfo += fmt.Sprintf("*GPT4* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt4+usage.Gpt4Context, config.Limit.Gpt4Limit)
+			limitsInfo += fmt.Sprintf("*GPT4 Omni* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt4+usage.Gpt4Context, config.Limit.Gpt4Limit)
 		}
 		if config.Limit.Dalle3Limit > 0 {
 			limitsInfo += fmt.Sprintf("*Dalle3* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Dalle3+usage.Dalle3Context, config.Limit.Dalle3Limit)
