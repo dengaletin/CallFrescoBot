@@ -15,7 +15,7 @@ type PromoCommand struct {
 	BaseCommand
 }
 
-func (cmd PromoCommand) RunCommand() (tg.Chattable, error) {
+func (cmd PromoCommand) RunCommand() ([]tg.Chattable, error) {
 	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, "")
 
 	nk, err := numericKeyboard.CreateNumericKeyboard("main", cmd.User, "main")
@@ -29,34 +29,34 @@ func (cmd PromoCommand) RunCommand() (tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
 		msg.Text = result
-		return msg, err
+		return []tg.Chattable{msg}, err
 	}
 
 	promoCode, err := parsePromoCode(cmd.Update.Message.Text)
 	if err != nil {
 		msg.Text = utils.LocalizeSafe(consts.StartMsg)
-		return msg, err
+		return []tg.Chattable{msg}, err
 	}
 
 	if !cmd.User.IsNew {
 		msg.Text = utils.LocalizeSafe(consts.StartMsg)
-		return msg, errors.New("user is not new")
+		return []tg.Chattable{msg}, errors.New("user is not new")
 	}
 
 	campaign, err := campaignService.Get(promoCode)
 	if err != nil {
 		msg.Text = utils.LocalizeSafe(consts.StartMsg)
-		return msg, err
+		return []tg.Chattable{msg}, err
 	}
 
 	if err = promoService.Create(campaign.Id, cmd.User); err != nil {
 		msg.Text = utils.LocalizeSafe(consts.StartMsg)
-		return msg, err
+		return []tg.Chattable{msg}, err
 	}
 
 	msg.Text = utils.LocalizeSafe(consts.StartMsg)
 
-	return msg, err
+	return []tg.Chattable{msg}, err
 }
 
 func parsePromoCode(messageText string) (string, error) {

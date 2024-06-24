@@ -51,6 +51,11 @@ func ResolveAndHandle(query *tgbotapi.CallbackQuery, user *models.User, bot *tgb
 		if err != nil {
 			return err
 		}
+	case "firstRun":
+		err := handleFirstRun(data, user, bot, query)
+		if err != nil {
+			return err
+		}
 	default:
 		log.Printf("Unknown query type: %s", data.Type)
 
@@ -126,6 +131,72 @@ func handleLanguage(data QueryData, user *models.User, bot *tgbotapi.BotAPI, que
 	}
 
 	nk, err := numericKeyboard.CreateNumericKeyboard("language", user, data.Extra)
+	if err != nil {
+		log.Printf("Error creating keyboard: %v", err)
+		return err
+	}
+
+	if nk == nil {
+		log.Printf("Error: numeric keyboard is nil")
+
+		return errors.New("numeric keyboard is nil")
+	}
+
+	message := utils.LocalizeSafe(consts.StartMsg)
+	if data.Extra == "options" {
+		message = utils.LocalizeSafe(consts.OptionsMessage)
+	}
+
+	botMsg := tgbotapi.NewEditMessageText(
+		query.Message.Chat.ID,
+		query.Message.MessageID,
+		message,
+	)
+	botMsg.ParseMode = "markdown"
+
+	_, err = bot.Send(botMsg)
+	if err != nil {
+		return err
+	}
+
+	_, err = bot.Send(tgbotapi.NewEditMessageReplyMarkup(
+		query.Message.Chat.ID,
+		query.Message.MessageID,
+		*nk,
+	))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func handleFirstRun(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) error {
+	_, err := bot.Request(tgbotapi.NewCallback(query.ID, ""))
+	if err != nil {
+		log.Printf("Error while responding to callback query: %s", err)
+		return err
+	}
+
+	language, err := strconv.ParseInt(data.Value, 10, 64)
+	if err != nil {
+		log.Printf("handleMode: parse int64 error: %v", err)
+		return err
+	}
+
+	err = userService.SetLanguage(language, user)
+	if err != nil {
+		return err
+	}
+
+	utils.InitBundle(user.Lang)
+
+	mainMenuErr := numericKeyboard.CreateMainMenu()
+	if mainMenuErr != nil {
+		log.Printf(mainMenuErr.Error())
+	}
+
+	nk, err := numericKeyboard.CreateNumericKeyboard("main", user, data.Extra)
 	if err != nil {
 		log.Printf("Error creating keyboard: %v", err)
 		return err

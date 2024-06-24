@@ -12,15 +12,15 @@ type GptCommand struct {
 	BaseCommand
 }
 
-func (cmd GptCommand) RunCommand() (tg.Chattable, error) {
+func (cmd GptCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(true)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	gptResponse, err := gpt.GetResponse(cmd.Update, cmd.User, openai.GPT3Dot5Turbo)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg)), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))}, err
 	}
 
 	return gptResponse, nil

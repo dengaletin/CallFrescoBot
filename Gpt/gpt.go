@@ -12,6 +12,7 @@ import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
 	"log"
+	"strings"
 )
 
 func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
@@ -22,14 +23,13 @@ func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest)
 	return res, nil
 }
 
-func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompletionResponse) (tg.Chattable, error) {
+func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompletionResponse) ([]tg.Chattable, error) {
 	err := messageService.CreateMessage(user.Id, update.Message.Text, res.Choices[0].Message.Content, user.Mode)
 	if err != nil {
 		return nil, fmt.Errorf("error creating message: %w", err)
 	}
 
 	userMode := user.Mode
-
 	if user.Dialog == 1 {
 		userMode = userMode + 100
 	}
@@ -40,14 +40,37 @@ func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompl
 	}
 
 	text := res.Choices[0].Message.Content
+	parts := splitMessage(text, 4095)
 
-	message := tg.NewMessage(update.Message.Chat.ID, text)
-	message.ReplyToMessageID = update.Message.MessageID
+	var messages []tg.Chattable
+	for _, part := range parts {
+		message := tg.NewMessage(update.Message.Chat.ID, part)
+		message.ReplyToMessageID = update.Message.MessageID
+		messages = append(messages, message)
+	}
 
-	return message, nil
+	return messages, nil
 }
 
-func GetResponse(update tg.Update, user *models.User, model string) (tg.Chattable, error) {
+func splitMessage(text string, maxLength int) []string {
+	var parts []string
+	for len(text) > maxLength {
+		splitIndex := maxLength
+		if len(text) > maxLength {
+			splitIndex = strings.LastIndex(text[:maxLength], " ")
+			if splitIndex == -1 {
+				splitIndex = maxLength
+			}
+		}
+		parts = append(parts, text[:splitIndex])
+		text = text[splitIndex:]
+	}
+	parts = append(parts, text)
+
+	return parts
+}
+
+func GetResponse(update tg.Update, user *models.User, model string) ([]tg.Chattable, error) {
 	if utils.GetEnvVar("GPT_API_KEY") == "" {
 		return nil, errors.New(consts.ErrorMissingGptKey)
 	}

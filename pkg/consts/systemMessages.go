@@ -2,6 +2,7 @@ package consts
 
 const (
 	StartMsg                  = "StartMsg"
+	FirstRunMsg               = "FirstRunMsg"
 	BuyMsg                    = "BuyMsg"
 	Buy                       = "Buy"
 	ErrorMsg                  = "ErrorMsg"
@@ -18,7 +19,9 @@ const (
 	SuccessRef                = "SuccessRef"
 	Forget                    = "Forget"
 	EnglishLanguage           = "EnglishLanguage"
+	EnglishLanguageWithFlag   = "EnglishLanguageWithFlag"
 	RussianLanguage           = "RussianLanguage"
+	RussianLanguageWithFlag   = "RussianLanguageWithFlag"
 	BackButton                = "BackButton"
 	ContextSupportButton      = "ContextSupportButton"
 	LanguageSelectButton      = "LanguageSelectButton"

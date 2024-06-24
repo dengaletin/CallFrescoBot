@@ -56,17 +56,19 @@ func handleUpdate(update tg.Update, bot *tg.BotAPI) error {
 		log.Printf(messageInfo)
 	}
 
-	if err := processMessage(update, bot, messageInfo); err != nil {
+	messageErr := processMessage(update, bot, messageInfo)
+	if messageErr != nil {
 		sendMsgErr := messageService.SendMsgToUser(update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))
 		if sendMsgErr != nil {
 			return sendMsgErr
 		}
 
-		return fmt.Errorf("process message error: %w", err)
+		return fmt.Errorf("process message error: %w", messageErr)
 	}
 
-	if err := processCallback(update, bot, messageInfo); err != nil {
-		return fmt.Errorf("process callback error: %w", err)
+	callbackErr := processCallback(update, bot, messageInfo)
+	if callbackErr != nil {
+		return fmt.Errorf("process callback error: %w", callbackErr)
 	}
 
 	return nil
@@ -93,12 +95,24 @@ func processMessage(update tg.Update, bot *tg.BotAPI, messageInfo string) error 
 		return logAndNotifyOnErr(messageInfo, mainMenuErr)
 	}
 
-	response, commandErr := commands.GetCommand(update, user).RunCommand()
+	responses, commandErr := commands.GetCommand(update, user).RunCommand()
 	if notifyErr := logAndNotifyOnErr(messageInfo, commandErr); notifyErr != nil {
 		return notifyErr
 	}
 
-	return sendBotResponse(bot, response)
+	return sendBotResponses(bot, responses)
+}
+
+func sendBotResponses(bot *tg.BotAPI, responses []tg.Chattable) error {
+	if responses == nil {
+		return nil
+	}
+	for _, response := range responses {
+		if _, err := bot.Send(response); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func processCallback(update tg.Update, bot *tg.BotAPI, messageInfo string) error {

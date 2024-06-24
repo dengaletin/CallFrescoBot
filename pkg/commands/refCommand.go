@@ -15,32 +15,32 @@ type RefCommand struct {
 	BaseCommand
 }
 
-func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
+func (cmd RefCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
-		return newMessage(cmd.Update, result), err
+		return []tg.Chattable{newMessage(cmd.Update, result)}, err
 	}
 
 	refID, err := parseReferralID(cmd.Update.Message.Text)
 	if err != nil {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
+		return []tg.Chattable{newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg))}, err
 	}
 
 	if refID == cmd.User.TgId {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), errors.New("cannot refer self")
+		return []tg.Chattable{newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg))}, errors.New("cannot refer self")
 	}
 
 	if !cmd.User.IsNew {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), errors.New("user is not new")
+		return []tg.Chattable{newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg))}, errors.New("user is not new")
 	}
 
 	referringUser, err := userService.GerUserByTgId(refID)
 	if err != nil {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
+		return []tg.Chattable{newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg))}, err
 	}
 
 	if _, err = userRefService.Create(referringUser, cmd.User); err != nil {
-		return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), err
+		return []tg.Chattable{newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg))}, err
 	}
 
 	/*
@@ -54,7 +54,7 @@ func (cmd RefCommand) RunCommand() (tg.Chattable, error) {
 		}
 	*/
 
-	return newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg)), nil
+	return []tg.Chattable{newMessage(cmd.Update, utils.LocalizeSafe(consts.StartMsg))}, nil
 }
 
 func newMessage(update tg.Update, text string) tg.Chattable {

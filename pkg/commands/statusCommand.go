@@ -18,10 +18,10 @@ type StatusCommand struct {
 	BaseCommand
 }
 
-func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
+func (cmd StatusCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	subscription, err := subscriptionService.GetUserSubscriptionWithNoPlanLimit(cmd.User)
@@ -87,7 +87,7 @@ func (cmd StatusCommand) RunCommand() (tg.Chattable, error) {
 	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, msgText)
 	msg.ParseMode = "markdown"
 
-	return msg, nil
+	return []tg.Chattable{msg}, nil
 }
 
 func RemainingMessages(subscriptionLimit int64, messagesCount int64) int64 {

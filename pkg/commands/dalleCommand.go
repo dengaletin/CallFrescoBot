@@ -11,17 +11,17 @@ type DalleCommand struct {
 	BaseCommand
 }
 
-func (cmd DalleCommand) RunCommand() (tg.Chattable, error) {
+func (cmd DalleCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(true)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	dalleResponse, err := Dalle3.GetResponse(cmd.Update, cmd.User)
 
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg)), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))}, err
 	}
 
-	return dalleResponse, nil
+	return []tg.Chattable{dalleResponse}, nil
 }

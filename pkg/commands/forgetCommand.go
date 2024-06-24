@@ -11,16 +11,16 @@ type ForgetCommand struct {
 	BaseCommand
 }
 
-func (cmd ForgetCommand) RunCommand() (tg.Chattable, error) {
+func (cmd ForgetCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	err = userService.SetUserDialogFromId(cmd.User)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg)), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))}, err
 	}
 
-	return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.Forget)), nil
+	return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.Forget))}, nil
 }

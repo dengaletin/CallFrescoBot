@@ -7,19 +7,19 @@ import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type StartCommand struct {
+type FirstRun struct {
 	BaseCommand
 }
 
-func (cmd StartCommand) RunCommand() ([]tg.Chattable, error) {
+func (cmd FirstRun) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
 		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
-	nk, err := numericKeyboard.CreateNumericKeyboard("main", cmd.User, "main")
+	nk, err := numericKeyboard.CreateNumericKeyboard("firstRun", cmd.User, "firstRun")
 
-	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.StartMsg))
+	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.FirstRunMsg))
 	msg.ReplyMarkup = nk
 	msg.ParseMode = "markdown"
 

@@ -11,10 +11,10 @@ type OptionsCommand struct {
 	BaseCommand
 }
 
-func (cmd OptionsCommand) RunCommand() (tg.Chattable, error) {
+func (cmd OptionsCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	nk, err := numericKeyboard.CreateNumericKeyboard("main", cmd.User, "options")
@@ -23,5 +23,5 @@ func (cmd OptionsCommand) RunCommand() (tg.Chattable, error) {
 	msg.ReplyMarkup = nk
 	msg.ParseMode = "markdown"
 
-	return msg, nil
+	return []tg.Chattable{msg}, nil
 }

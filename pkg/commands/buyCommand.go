@@ -12,10 +12,10 @@ type BuyCommand struct {
 	BaseCommand
 }
 
-func (cmd BuyCommand) RunCommand() (tg.Chattable, error) {
+func (cmd BuyCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	nk, err := numericKeyboard.CreateNumericKeyboard("buy", cmd.User, "buy")
@@ -48,5 +48,5 @@ func (cmd BuyCommand) RunCommand() (tg.Chattable, error) {
 	photoMsg.ParseMode = msg.ParseMode
 	photoMsg.ReplyMarkup = msg.ReplyMarkup
 
-	return photoMsg, nil
+	return []tg.Chattable{photoMsg}, nil
 }

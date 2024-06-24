@@ -75,6 +75,8 @@ func CreateNumericKeyboard(keyboardType string, user *models.User, extra string)
 	switch keyboardType {
 	case "main":
 		return createMainKeyboard(user, extra), nil
+	case "firstRun":
+		return createLanguageKeyboardWithoutBack(user, extra), nil
 	case "options":
 		return createMainKeyboard(user, extra), nil
 	case "language":
@@ -102,17 +104,26 @@ func createLanguageKeyboard(user *models.User, extra string) *tg.InlineKeyboardM
 	return &keyboard
 }
 
+func createLanguageKeyboardWithoutBack(user *models.User, extra string) *tg.InlineKeyboardMarkup {
+	englishButton := createButtonWithLangFirstRun(utils.LocalizeSafe(consts.EnglishLanguageWithFlag), user.Lang, 1, extra)
+	russianButton := createButtonWithLangFirstRun(utils.LocalizeSafe(consts.RussianLanguageWithFlag), user.Lang, 2, extra)
+
+	keyboard := tg.NewInlineKeyboardMarkup(
+		tg.NewInlineKeyboardRow(englishButton, russianButton),
+	)
+
+	return &keyboard
+}
+
 func createMainKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
 	chatGPTButton := createButtonWithMode("GPT3.5", extra, user.Mode, ModeChatGPT35)
 	dalleButton := createButtonWithMode("DallE3", extra, user.Mode, ModeDallE)
 	chatGPT4Button := createButtonWithMode("GPT4-Omni", extra, user.Mode, ModeChatGPT4)
-	claudeButton := createButtonWithMode("Claude (coming soon)", extra, user.Mode, Claude)
 	contextButton := createButtonWithContext(utils.LocalizeSafe(consts.ContextSupportButton), extra, user.Dialog)
 	languageButton := createButtonWithLanguage(utils.LocalizeSafe(consts.LanguageSelectButton), extra)
 
 	keyboard := tg.NewInlineKeyboardMarkup(
 		tg.NewInlineKeyboardRow(chatGPTButton, dalleButton, chatGPT4Button),
-		tg.NewInlineKeyboardRow(claudeButton),
 		tg.NewInlineKeyboardRow(contextButton),
 		tg.NewInlineKeyboardRow(languageButton),
 	)
@@ -148,6 +159,16 @@ func createButtonWithLang(text string, mode int64, buttonMode int64, extra strin
 	}
 	payload := createPayloadData(keyboardPayload{
 		Type:  "language",
+		Value: strconv.FormatInt(buttonMode, 10),
+		Extra: extra,
+	})
+
+	return tg.NewInlineKeyboardButtonData(text, payload)
+}
+
+func createButtonWithLangFirstRun(text string, mode int64, buttonMode int64, extra string) tg.InlineKeyboardButton {
+	payload := createPayloadData(keyboardPayload{
+		Type:  "firstRun",
 		Value: strconv.FormatInt(buttonMode, 10),
 		Extra: extra,
 	})
@@ -197,8 +218,8 @@ func createBuyKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup
 		return nil
 	}
 
-	var rows [][]tg.InlineKeyboardButton  // Сохраняем ряды кнопок
-	var tempRow []tg.InlineKeyboardButton // Временная переменная для единого ряда
+	var rows [][]tg.InlineKeyboardButton
+	var tempRow []tg.InlineKeyboardButton
 
 	for i, p := range plans {
 		var config types.Config
@@ -210,10 +231,6 @@ func createBuyKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup
 
 		currencySign := "$"
 		planPrice := config.PriceEn
-		//if user.Lang == consts.LangRu {
-		//	planPrice = config.PriceRu
-		//	currencySign = "₽"
-		//}
 
 		planName := p.Name
 		buttonText := planName + " - " + currencySign + strconv.FormatFloat(planPrice, 'f', 2, 64)

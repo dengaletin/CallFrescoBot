@@ -11,15 +11,15 @@ type InviteCommand struct {
 	BaseCommand
 }
 
-func (cmd InviteCommand) RunCommand() (tg.Chattable, error) {
+func (cmd InviteCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(false)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	inviteLink := fmt.Sprintf(utils.LocalizeSafe(consts.InviteLink), cmd.User.TgId)
 	message := tg.NewMessage(cmd.Update.Message.Chat.ID, inviteLink)
 	message.ParseMode = "markdown"
 
-	return message, nil
+	return []tg.Chattable{message}, nil
 }

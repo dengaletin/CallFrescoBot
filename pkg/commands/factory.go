@@ -2,6 +2,7 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/models"
+	"CallFrescoBot/pkg/utils"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"regexp"
 )
@@ -22,6 +23,9 @@ var commandRegistry = []CommandRegistryEntry{
 }
 
 func NewStartCommand(update tgbotapi.Update, user *models.User) ICommand {
+	if user.IsNew {
+		return FirstRun{BaseCommand{Update: update, User: user}}
+	}
 	return StartCommand{BaseCommand{Update: update, User: user}}
 }
 
@@ -62,7 +66,7 @@ func NewGptCommand(update tgbotapi.Update, user *models.User) ICommand {
 }
 
 func NewGpt4Command(update tgbotapi.Update, user *models.User) ICommand {
-	return Gpt4Command{BaseCommand{Update: update, User: user}}
+	return Gpt4Command{BaseCommand{Update: update, User: user}, utils.GetBot()}
 }
 
 func NewClaudeCommand(update tgbotapi.Update, user *models.User) ICommand {

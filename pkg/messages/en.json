@@ -4,6 +4,10 @@
     "translation": "Fresco AI is ready to go! Choose a mode and forge ahead!\n\n\uD83D\uDCF2 ChatGPT Mode works with textual information. Ask Fresco anything from birthday greetings for your favorite aunt to a scientific research request.\n\n\uD83C\uDFA8 DALL-E 3 Mode will create any image, as long as it doesn't violate its rules. Describe to Fresco everything you want to see and enjoy the result.\n\n\uD83D\uDCAC Dialogue (Context) Mode helps enhance your query. When activated, Fresco considers your previous response and supplements it with a new command.\n\nIn the free version, you have 5 requests per day. Need more? Take advantage of one of the offered tariff plans (command /buy).\n\nReady? Let's go!"
   },
   {
+    "id": "FirstRunMsg",
+    "translation": "Fresco AI is ready to go! Choose a language and forge ahead!"
+  },
+  {
     "id": "BuyMsg",
     "translation": "*Subscription Plans* \uD83D\uDE80\n\nExpand your interaction with the bot by choosing one of our flexible subscription plans. Say goodbye to waiting periods and hello to seamless conversation with increased request limits.\n\nEscape the 24-hour wait of the free version and enjoy uninterrupted service.\n\n*Payment Methods* \uD83D\uDCB3\uD83D\uDCB2\n\nChoose from flexible payment options:\n- Card\n- Cryptocurrency\n\n*How to Pay* \uD83D\uDCA1\n\n1. Select the subscription plan that suits your needs.\n2. Click the «Buy» button.\n3. Follow the provided link to our partner's page.\n4. Choose a payment method that is convenient for you.\n\nReady to upgrade? Buy Subscription ⬇\uFE0F"
   },
@@ -64,8 +68,16 @@
     "translation": "English"
   },
   {
+    "id": "EnglishLanguageWithFlag",
+    "translation": "\uD83C\uDDFA\uD83C\uDDF8 English"
+  },
+  {
     "id": "RussianLanguage",
     "translation": "Russian"
+  },
+  {
+    "id": "RussianLanguageWithFlag",
+    "translation": "\uD83C\uDDF7\uD83C\uDDFA Russian"
   },
   {
     "id": "BackButton",

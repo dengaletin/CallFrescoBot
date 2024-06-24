@@ -11,16 +11,16 @@ type ClaudeCommand struct {
 	BaseCommand
 }
 
-func (cmd ClaudeCommand) RunCommand() (tg.Chattable, error) {
+func (cmd ClaudeCommand) RunCommand() ([]tg.Chattable, error) {
 	result, err := cmd.Common(true)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, result), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
 	claudeResponse, err := claude.GetResponse(cmd.Update, cmd.User)
 	if err != nil {
-		return tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg)), err
+		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))}, err
 	}
 
-	return claudeResponse, nil
+	return []tg.Chattable{claudeResponse}, nil
 }
