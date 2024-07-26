@@ -11,8 +11,8 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.2.1 // indirect
-	github.com/sagikazarmark/locafero v0.4.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
+	github.com/sagikazarmark/locafero v0.6.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
@@ -27,13 +27,13 @@ require (
 
 require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
-	github.com/liushuangls/go-anthropic/v2 v2.0.3
+	github.com/liushuangls/go-anthropic/v2 v2.4.1
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/pkg/errors v0.9.1
-	github.com/sashabaranov/go-openai v1.24.0
-	github.com/spf13/viper v1.18.2
-	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
-	golang.org/x/text v0.14.0
-	gorm.io/driver/mysql v1.5.6
-	gorm.io/gorm v1.25.9
+	github.com/sashabaranov/go-openai v1.27.0
+	github.com/spf13/viper v1.19.0
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
+	golang.org/x/text v0.16.0
+	gorm.io/driver/mysql v1.5.7
+	gorm.io/gorm v1.25.11
 )
