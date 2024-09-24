@@ -30,7 +30,7 @@ require (
 	github.com/liushuangls/go-anthropic/v2 v2.4.1
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/pkg/errors v0.9.1
-	github.com/sashabaranov/go-openai v1.27.0
+	github.com/sashabaranov/go-openai v1.30.0
 	github.com/spf13/viper v1.19.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/text v0.16.0
