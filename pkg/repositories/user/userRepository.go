@@ -66,7 +66,7 @@ func GetUserById(id uint64, db *gorm.DB) (*models.User, error) {
 }
 
 func SetMode(mode int64, user *models.User, db *gorm.DB) error {
-	modes := []int64{0, 1, 2, 3}
+	modes := []int64{consts.Gpt4oMiniMode, consts.DalleMode, consts.Gpt4oMode, consts.Gpt4o1Mode}
 	modeStatus := slices.Contains(modes, mode)
 
 	if modeStatus == false {
@@ -83,7 +83,7 @@ func SetMode(mode int64, user *models.User, db *gorm.DB) error {
 }
 
 func SetLanguage(language int64, user *models.User, db *gorm.DB) error {
-	languages := []int64{1, 2}
+	languages := []int64{consts.LangEn, consts.LangRu}
 	languageStatus := slices.Contains(languages, language)
 
 	if languageStatus == false {
@@ -100,7 +100,7 @@ func SetLanguage(language int64, user *models.User, db *gorm.DB) error {
 }
 
 func SetDialogStatus(dialogStatus int64, user *models.User, db *gorm.DB) error {
-	allowedValue := []int64{0, 1}
+	allowedValue := []int64{consts.DialogModeOff, consts.DialogModeOn}
 	dialogStatusValue := slices.Contains(allowedValue, dialogStatus)
 
 	if dialogStatusValue == false {
@@ -118,12 +118,14 @@ func SetDialogStatus(dialogStatus int64, user *models.User, db *gorm.DB) error {
 
 func GetMode(mode int64) (string, error) {
 	switch mode {
-	case 0:
-		return utils.LocalizeSafe(consts.ModeGpt35), nil
-	case 1:
+	case consts.Gpt4oMiniMode:
+		return utils.LocalizeSafe(consts.ModeGpt4oMini), nil
+	case consts.DalleMode:
 		return utils.LocalizeSafe(consts.ModeDalle3), nil
-	case 2:
+	case consts.Gpt4oMode:
 		return utils.LocalizeSafe(consts.ModeGpt4), nil
+	case consts.Gpt4o1Mode:
+		return utils.LocalizeSafe(consts.ModeGpt4o1), nil
 	default:
 		return "", errors.New("unknown mode")
 	}
@@ -141,8 +143,8 @@ func SetDialogFromId(messageId uint64, user *models.User, db *gorm.DB) error {
 
 func ResetSubscription(user *models.User, db *gorm.DB) error {
 	result := db.Model(user).Updates(map[string]interface{}{
-		"mode":   0,
-		"dialog": 0,
+		"mode":   consts.Gpt4oMiniMode,
+		"dialog": consts.DialogModeOff,
 	})
 
 	if result.Error != nil {

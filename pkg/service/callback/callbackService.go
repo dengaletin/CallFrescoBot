@@ -276,8 +276,8 @@ func handleMode(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *
 		}
 
 		switch mode {
-		case consts.UsageModeGpt35:
-			if config.Limit.Gpt35Limit <= 0 {
+		case consts.UsageModeGpt4OMini:
+			if config.Limit.Gpt4OMiniLimit <= 0 {
 				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
 				if sendErr != nil {
 					return sendErr
@@ -292,16 +292,16 @@ func handleMode(data QueryData, user *models.User, bot *tgbotapi.BotAPI, query *
 				}
 				return errors.New("unavailable in your plan")
 			}
-		case consts.UsageModeGpt4:
-			if config.Limit.Gpt4Limit <= 0 {
+		case consts.UsageModeGpt4O:
+			if config.Limit.Gpt4OLimit <= 0 {
 				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
 				if sendErr != nil {
 					return sendErr
 				}
 				return errors.New("unavailable in your plan")
 			}
-		case consts.UsageModeClaude:
-			if config.Limit.ClaudeLimit <= 0 {
+		case consts.UsageModeGpt4O1:
+			if config.Limit.Gpt4O1Limit <= 0 {
 				_, sendErr := bot.Send(tgbotapi.NewMessage(query.Message.Chat.ID, utils.LocalizeSafe(consts.UnavailableInYourPlan)))
 				if sendErr != nil {
 					return sendErr

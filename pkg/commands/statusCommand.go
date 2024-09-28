@@ -52,17 +52,29 @@ func (cmd StatusCommand) RunCommand() ([]tg.Chattable, error) {
 		}
 
 		limitsInfo := ""
-		if config.Limit.Gpt35Limit > 0 {
-			limitsInfo += fmt.Sprintf("*GPT4o-mini* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt35+usage.Gpt35Context, config.Limit.Gpt35Limit)
+		if config.Limit.Gpt4OMiniLimit > 0 {
+			limitsInfo += fmt.Sprintf(
+				"*GPT4o-mini* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
+				usage.Gpt4OMini+usage.Gpt4OMiniContext, config.Limit.Gpt4OMiniLimit,
+			)
 		}
-		if config.Limit.Gpt4Limit > 0 {
-			limitsInfo += fmt.Sprintf("*GPT4o1* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Gpt4+usage.Gpt4Context, config.Limit.Gpt4Limit)
+		if config.Limit.Gpt4OLimit > 0 {
+			limitsInfo += fmt.Sprintf(
+				"*GPT4o* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
+				usage.Gpt4O+usage.Gpt4OContext, config.Limit.Gpt4OLimit,
+			)
 		}
 		if config.Limit.Dalle3Limit > 0 {
-			limitsInfo += fmt.Sprintf("*Dalle3* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Dalle3+usage.Dalle3Context, config.Limit.Dalle3Limit)
+			limitsInfo += fmt.Sprintf(
+				"*Dalle3* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
+				usage.Dalle3+usage.Dalle3Context, config.Limit.Dalle3Limit,
+			)
 		}
-		if config.Limit.ClaudeLimit > 0 {
-			limitsInfo += fmt.Sprintf("*Claude* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n", usage.Claude+usage.ClaudeContext, config.Limit.ClaudeLimit)
+		if config.Limit.Gpt4O1Limit > 0 {
+			limitsInfo += fmt.Sprintf(
+				"*GPT4o1* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
+				usage.Gpt4O1+usage.Gpt4O1Context, config.Limit.Gpt4O1Limit,
+			)
 		}
 		contextSupport := utils.LocalizeSafe(consts.No)
 		if config.Limit.ContextSupport {

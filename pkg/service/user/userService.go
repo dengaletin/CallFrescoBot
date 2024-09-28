@@ -88,30 +88,30 @@ func ValidateUser(user *models.User) (string, error) {
 		}
 
 		switch userMode {
-		case consts.UsageModeGpt35:
-			if config.Limit.Gpt35Limit <= 0 {
-				return "GPT-3.5 model is not available in your subscription", errors.New("GPT-3.5 model is not available in your subscription")
+		case consts.UsageModeGpt4OMini:
+			if config.Limit.Gpt4OMiniLimit <= 0 {
+				return "Model is not available in your subscription", errors.New("GPT-4o-mini model is not available in your subscription")
 			}
-			usageCount = usage.Gpt35 + usage.Gpt35Context
-			currentLimit = config.Limit.Gpt35Limit
+			usageCount = usage.Gpt4OMini + usage.Gpt4OMiniContext
+			currentLimit = config.Limit.Gpt4OMiniLimit
 		case consts.UsageModeDalle3:
 			if config.Limit.Dalle3Limit <= 0 {
-				return "DALL-E 3 model is not available in your subscription", errors.New("DALL-E 3 model is not available in your subscription")
+				return "Model is not available in your subscription", errors.New("DALL-E-3 model is not available in your subscription")
 			}
 			usageCount = usage.Dalle3 + usage.Dalle3Context
 			currentLimit = config.Limit.Dalle3Limit
-		case consts.UsageModeGpt4:
-			if config.Limit.Gpt4Limit <= 0 {
-				return "GPT-4 model is not available in your subscription", errors.New("GPT-4 model is not available in your subscription")
+		case consts.UsageModeGpt4O:
+			if config.Limit.Gpt4OLimit <= 0 {
+				return "Model is not available in your subscription", errors.New("GPT-4-o model is not available in your subscription")
 			}
-			usageCount = usage.Gpt4 + usage.Gpt4Context
-			currentLimit = config.Limit.Gpt4Limit
-		case consts.UsageModeClaude:
-			if config.Limit.ClaudeLimit <= 0 {
-				return "Claude model is not available in your subscription", errors.New("Claude model is not available in your subscription")
+			usageCount = usage.Gpt4O + usage.Gpt4OContext
+			currentLimit = config.Limit.Gpt4OLimit
+		case consts.UsageModeGpt4O1:
+			if config.Limit.Gpt4O1Limit <= 0 {
+				return "Model is not available in your subscription", errors.New("GPT-4-o1 model is not available in your subscription")
 			}
-			usageCount = usage.Claude + usage.ClaudeContext
-			currentLimit = config.Limit.ClaudeLimit
+			usageCount = usage.Gpt4O1 + usage.Gpt4O1Context
+			currentLimit = config.Limit.Gpt4O1Limit
 		default:
 			return "", fmt.Errorf("unknown usage mode: %w", err)
 		}

@@ -1,9 +1,9 @@
 package types
 
 type Limit struct {
-	Gpt35Limit     int  `json:"gpt35_limit"`
-	Gpt4Limit      int  `json:"gpt4_limit"`
-	Dalle3Limit    int  `json:"dalle3_limit"`
-	ClaudeLimit    int  `json:"claude_limit"`
-	ContextSupport bool `json:"context_support"`
+	Gpt4OMiniLimit int  `json:"gpt4OMiniLimit"`
+	Gpt4OLimit     int  `json:"Gpt4OLimit"`
+	Dalle3Limit    int  `json:"Dalle3Limit"`
+	Gpt4O1Limit    int  `json:"Gpt4O1Limit"`
+	ContextSupport bool `json:"ContextSupport"`
 }

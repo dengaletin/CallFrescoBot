@@ -17,11 +17,11 @@ func (cmd DalleCommand) RunCommand() ([]tg.Chattable, error) {
 		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
-	dalleResponse, err := Dalle3.GetResponse(cmd.Update, cmd.User)
+	res, err := Dalle3.GetResponse(cmd.Update, cmd.User)
 
 	if err != nil {
 		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))}, err
 	}
 
-	return []tg.Chattable{dalleResponse}, nil
+	return []tg.Chattable{res}, nil
 }

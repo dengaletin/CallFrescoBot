@@ -45,10 +45,10 @@ func LocalizeSafe(messageID string) string {
 func resolveLangById(id int64) string {
 	switch id {
 	case consts.LangEn:
-		return "en"
+		return consts.LangEnName
 	case consts.LangRu:
-		return "ru"
+		return consts.LangRuName
 	default:
-		return "en"
+		return consts.LangEnName
 	}
 }

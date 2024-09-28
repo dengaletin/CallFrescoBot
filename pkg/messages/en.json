@@ -9,7 +9,7 @@
   },
   {
     "id": "BuyMsg",
-    "translation": "*Subscription Plans* \uD83D\uDE80\n\nExpand your interaction with the bot by choosing one of our flexible subscription plans. Say goodbye to waiting periods and hello to seamless conversation with increased request limits.\n\nEscape the 24-hour wait of the free version and enjoy uninterrupted service.\n\n*Payment Methods* \uD83D\uDCB3\uD83D\uDCB2\n\nChoose from flexible payment options:\n- Card\n- Cryptocurrency\n\n*How to Pay* \uD83D\uDCA1\n\n1. Select the subscription plan that suits your needs.\n2. Click the «Buy» button.\n3. Follow the provided link to our partner's page.\n4. Choose a payment method that is convenient for you.\n\nReady to upgrade? Buy Subscription ⬇\uFE0F"
+    "translation": "**Premium Subscription \uD83D\uDE80**\n\nEnhance your interaction with the bot by upgrading to our **Premium** subscription. Say goodbye to waiting periods and hello to seamless conversations with increased request limits.\n\nEscape the 24-hour wait of the free version and enjoy uninterrupted service.\n\n**Payment Methods \uD83D\uDCB3\uD83D\uDCB2**\n\nChoose from flexible payment options:\n\n- Card\n- Cryptocurrency\n\n**How to Pay \uD83D\uDCA1**\n\n1. Click the «Buy» button.\n2. Follow the provided link to our partner's page.\n3. Choose a payment method that is convenient for you.\n\nReady to upgrade? **Buy Subscription** ⬇\uFE0F"
   },
   {
     "id": "ErrorMsg",
@@ -45,7 +45,7 @@
   },
   {
     "id": "OptionsMessage",
-    "translation": "⚙\uFE0F Bot Settings\n\nIn this section, you can: \n\n✅ Select the interface language (English/Russian).\n\n✅ Choose a text information processing mode:\n\n▪\uFE0F GPT-3.5 — this is an advanced next-generation model after GPT-3 (Generative Pre-trained Transformer 3), which is one of the most powerful models for text generation. \n\n▪\uFE0F GPT-4 has even more parameters than the previous models. Its capabilities to understand and generate texts are improved, as well as its performance on tasks that require logical thinking and context recognition.\n\n▪\uFE0F Claude - an AI assistant created by Anthropic to be helpful, harmless, and honest. Claude is focused on having polite, respectful conversations and providing truthful information to users.\n\n✅ Choose the Dall-E 3 mode for image generation.\n\n✅ Enable or disable context support (dialogue mode). When the context is activated, the bot takes into account its previous response and complements it with a new command.\n\n\uD83D\uDCF2Technical Support: @dendefoe\n\nTo select a mode, press the button with its name ⬇\uFE0F"
+    "translation": "⚙\uFE0F Bot Settings\n\nIn this section, you can: \n\n✅ Select the interface language (English/Russian).\n\n✅ Choose a text information processing mode:\n\n✅ Choose the Dall-E 3 mode for image generation.\n\n✅ Enable or disable context support (dialogue mode). When the context is activated, the bot takes into account its previous response and complements it with a new command.\n\n\uD83D\uDCF2Technical Support: @dendefoe\n\nTo select a mode, press the button with its name ⬇\uFE0F"
   },
   {
     "id": "RunOutOfMessages",
@@ -93,15 +93,19 @@
   },
   {
     "id": "ModeGpt4",
-    "translation": "GPT-4 \uD83E\uDD16"
+    "translation": "GPT-4"
   },
   {
-    "id": "ModeGpt35",
-    "translation": "GPT-3.5 \uD83E\uDD16"
+    "id": "ModeGpt4oMini",
+    "translation": "GPT-4o-mini"
+  },
+  {
+    "id": "ModeGpt4o1",
+    "translation": "GPT-4o1"
   },
   {
     "id": "ModeDalle3",
-    "translation": "Dall-E 3 \uD83C\uDFA8"
+    "translation": "Dall-E 3"
   },
   {
     "id": "OnlyForPremium",

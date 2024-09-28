@@ -15,18 +15,6 @@ import (
 	"strconv"
 )
 
-const (
-	ModeChatGPT35 = iota
-	ModeDallE
-	ModeChatGPT4
-	Claude
-)
-
-const (
-	DialogOff = iota
-	DialogOn
-)
-
 type keyboardPayload struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
@@ -116,14 +104,16 @@ func createLanguageKeyboardWithoutBack(user *models.User, extra string) *tg.Inli
 }
 
 func createMainKeyboard(user *models.User, extra string) *tg.InlineKeyboardMarkup {
-	chatGPTButton := createButtonWithMode("GPT4o-mini", extra, user.Mode, ModeChatGPT35)
-	dalleButton := createButtonWithMode("DallE3", extra, user.Mode, ModeDallE)
-	chatGPT4Button := createButtonWithMode("GPT4o1", extra, user.Mode, ModeChatGPT4)
+	button1 := createButtonWithMode("GPT4o-mini", extra, user.Mode, consts.Gpt4oMiniMode)
+	button2 := createButtonWithMode("DallE3", extra, user.Mode, consts.DalleMode)
+	button3 := createButtonWithMode("GPT4o", extra, user.Mode, consts.Gpt4oMode)
+	button4 := createButtonWithMode("GPT4o1", extra, user.Mode, consts.Gpt4o1Mode)
 	contextButton := createButtonWithContext(utils.LocalizeSafe(consts.ContextSupportButton), extra, user.Dialog)
 	languageButton := createButtonWithLanguage(utils.LocalizeSafe(consts.LanguageSelectButton), extra)
 
 	keyboard := tg.NewInlineKeyboardMarkup(
-		tg.NewInlineKeyboardRow(chatGPTButton, dalleButton, chatGPT4Button),
+		tg.NewInlineKeyboardRow(button1, button2),
+		tg.NewInlineKeyboardRow(button3, button4),
 		tg.NewInlineKeyboardRow(contextButton),
 		tg.NewInlineKeyboardRow(languageButton),
 	)
@@ -178,9 +168,9 @@ func createButtonWithLangFirstRun(text string, mode int64, buttonMode int64, ext
 
 func createButtonWithContext(text string, extra string, dialog int64) tg.InlineKeyboardButton {
 	activePrefix := "✅ "
-	buttonValue := DialogOn
-	if dialog == DialogOn {
-		buttonValue = DialogOff
+	buttonValue := consts.DialogModeOn
+	if dialog == consts.DialogModeOn {
+		buttonValue = consts.DialogModeOff
 		text = activePrefix + text
 	}
 	payload := createPayloadData(keyboardPayload{

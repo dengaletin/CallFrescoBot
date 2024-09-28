@@ -1,12 +1,12 @@
 package types
 
 type Usage struct {
-	Gpt35         int `json:"gpt35"`
-	Gpt4          int `json:"gpt4"`
-	Dalle3        int `json:"dalle3"`
-	Claude        int `json:"claude"`
-	Gpt35Context  int `json:"gpt35_context"`
-	Gpt4Context   int `json:"gpt4_context"`
-	Dalle3Context int `json:"dalle3_context"`
-	ClaudeContext int `json:"claude_context"`
+	Gpt4OMini        int `json:"Gpt4OMini"`
+	Gpt4O            int `json:"Gpt4O"`
+	Dalle3           int `json:"Dalle3"`
+	Gpt4O1           int `json:"Gpt4O1"`
+	Gpt4OMiniContext int `json:"Gpt4OMiniContext"`
+	Gpt4OContext     int `json:"Gpt4OContext"`
+	Dalle3Context    int `json:"Dalle3Context"`
+	Gpt4O1Context    int `json:"Gpt4o1Context"`
 }

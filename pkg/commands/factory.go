@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"CallFrescoBot/pkg/consts"
 	"CallFrescoBot/pkg/models"
 	"CallFrescoBot/pkg/utils"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -14,7 +15,7 @@ const (
 
 type CommandRegistryEntry struct {
 	Pattern   *regexp.Regexp
-	Generator func(update tgbotapi.Update, user *models.User) ICommand
+	Generator func(update tgbotapi.Update, user *models.User) ICommandInterface
 }
 
 var commandRegistry = []CommandRegistryEntry{
@@ -22,58 +23,58 @@ var commandRegistry = []CommandRegistryEntry{
 	{Pattern: regexp.MustCompile(PromoCommandPattern), Generator: NewPromoCommand},
 }
 
-func NewStartCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewStartCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	if user.IsNew {
 		return FirstRun{BaseCommand{Update: update, User: user}}
 	}
 	return StartCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewRefCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewRefCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return RefCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewStatusCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewStatusCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return StatusCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewOptionsCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewOptionsCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return OptionsCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewInviteCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewInviteCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return InviteCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewPromoCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewPromoCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return PromoCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewBuyCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewBuyCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return BuyCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewForgetCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewForgetCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return ForgetCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewDalleCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewDalleCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return DalleCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewGptCommand(update tgbotapi.Update, user *models.User) ICommand {
+func NewGptCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return GptCommand{BaseCommand{Update: update, User: user}}
 }
 
-func NewGpt4Command(update tgbotapi.Update, user *models.User) ICommand {
+func NewGpt4Command(update tgbotapi.Update, user *models.User) ICommandInterface {
 	return Gpt4Command{BaseCommand{Update: update, User: user}, utils.GetBot()}
 }
 
-func NewClaudeCommand(update tgbotapi.Update, user *models.User) ICommand {
-	return ClaudeCommand{BaseCommand{Update: update, User: user}}
+func NewGpt4o1Command(update tgbotapi.Update, user *models.User) ICommandInterface {
+	return Gpt4o1Command{BaseCommand{Update: update, User: user}}
 }
 
-func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
+func GetCommand(update tgbotapi.Update, user *models.User) ICommandInterface {
 	for _, entry := range commandRegistry {
 		if entry.Pattern.MatchString(update.Message.Text) {
 			return entry.Generator(update, user)
@@ -85,8 +86,6 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 		return NewStartCommand(update, user)
 	case "/status":
 		return NewStatusCommand(update, user)
-	//case "/invite":
-	//	return NewInviteCommand(update, user)
 	case "/buy":
 		return NewBuyCommand(update, user)
 	case "/forget":
@@ -94,14 +93,14 @@ func GetCommand(update tgbotapi.Update, user *models.User) ICommand {
 	case "/options":
 		return NewOptionsCommand(update, user)
 	default:
-		if user.Mode == 1 {
+		if user.Mode == consts.DalleMode {
 			return NewDalleCommand(update, user)
 		}
-		if user.Mode == 2 {
+		if user.Mode == consts.Gpt4oMode {
 			return NewGpt4Command(update, user)
 		}
-		if user.Mode == 3 {
-			return NewClaudeCommand(update, user)
+		if user.Mode == consts.Gpt4o1Mode {
+			return NewGpt4o1Command(update, user)
 		}
 		return NewGptCommand(update, user)
 	}
