@@ -39,10 +39,6 @@ func createResources() error {
 		return errors.Wrap(err, "Failed to seed plans")
 	}
 
-	if err := utils.ClaudeUpdate(); err != nil {
-		return errors.Wrap(err, "Failed to update subscriptions")
-	}
-
 	if err := utils.CreateBot(); err != nil {
 		return errors.Wrap(err, "Failed to create bot")
 	}

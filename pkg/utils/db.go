@@ -91,40 +91,6 @@ func AutoMigrateDB() error {
 	return err
 }
 
-func ClaudeUpdate() error {
-	var subscriptions []models.Subscription
-	err := dbConn.Find(&subscriptions).Error
-	if err != nil {
-		return err
-	}
-
-	for _, sub := range subscriptions {
-		usage := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(sub.Usage), &usage); err != nil {
-			return err
-		}
-
-		if _, exists := usage["claude"]; !exists {
-			usage["claude"] = 0
-		}
-		if _, exists := usage["claude_context"]; !exists {
-			usage["claude_context"] = 0
-		}
-
-		updatedUsageJSON, err := json.Marshal(usage)
-		if err != nil {
-			return err
-		}
-
-		err = dbConn.Model(&models.Subscription{}).Where("id = ?", sub.Id).Update("usage", updatedUsageJSON).Error
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func SeedPlans() error {
 	db, connErr := GetDatabaseConnection()
 	if connErr != nil {
