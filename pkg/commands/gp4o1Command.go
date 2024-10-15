@@ -18,7 +18,8 @@ func (cmd Gpt4o1Command) RunCommand() ([]tg.Chattable, error) {
 		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
-	response, err := gpt.GetResponse(cmd.Update, cmd.User, openai.O1Preview)
+	bot := utils.GetBot()
+	response, err := gpt.GetResponse(bot, cmd.Update, cmd.User, openai.O1Mini)
 	if err != nil {
 		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.ErrorMsg))}, err
 	}
