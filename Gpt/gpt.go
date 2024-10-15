@@ -15,6 +15,28 @@ import (
 	"strings"
 )
 
+func GetResponse(update tg.Update, user *models.User, model string) ([]tg.Chattable, error) {
+	if utils.GetEnvVar("GPT_API_KEY") == "" {
+		return nil, errors.New(consts.ErrorMissingGptKey)
+	}
+
+	client := openai.NewClient(utils.GetEnvVar("GPT_API_KEY"))
+
+	sendMsgErr := messageService.SendMsgToUser(update.Message.Chat.ID, utils.LocalizeSafe(consts.GptLoading))
+	if sendMsgErr != nil {
+		return nil, sendMsgErr
+	}
+
+	request := createRequest(user, update, model)
+
+	resp, err := getResponseFromGPT(client, request)
+	if err != nil {
+		return nil, fmt.Errorf("error getting response from GPT: %w", err)
+	}
+
+	return handleGptResponse(update, user, resp)
+}
+
 func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
 	res, err := client.CreateChatCompletion(context.Background(), req)
 	if err != nil {
@@ -68,28 +90,6 @@ func splitMessage(text string, maxLength int) []string {
 	parts = append(parts, text)
 
 	return parts
-}
-
-func GetResponse(update tg.Update, user *models.User, model string) ([]tg.Chattable, error) {
-	if utils.GetEnvVar("GPT_API_KEY") == "" {
-		return nil, errors.New(consts.ErrorMissingGptKey)
-	}
-
-	client := openai.NewClient(utils.GetEnvVar("GPT_API_KEY"))
-
-	sendMsgErr := messageService.SendMsgToUser(update.Message.Chat.ID, utils.LocalizeSafe(consts.GptLoading))
-	if sendMsgErr != nil {
-		return nil, sendMsgErr
-	}
-
-	request := createRequest(user, update, model)
-
-	resp, err := getResponseFromGPT(client, request)
-	if err != nil {
-		return nil, fmt.Errorf("error getting response from GPT: %w", err)
-	}
-
-	return handleGptResponse(update, user, resp)
 }
 
 func createRequest(user *models.User, update tg.Update, model string) openai.ChatCompletionRequest {
