@@ -1,21 +1,31 @@
 package gpt
 
 import (
-	"CallFrescoBot/pkg/consts"
-	"CallFrescoBot/pkg/models"
-	"CallFrescoBot/pkg/service/message"
-	usageService "CallFrescoBot/pkg/service/usage"
-	"CallFrescoBot/pkg/utils"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
+
+	"CallFrescoBot/pkg/consts"
+	"CallFrescoBot/pkg/models"
+	messageService "CallFrescoBot/pkg/service/message"
+	usageService "CallFrescoBot/pkg/service/usage"
+	"CallFrescoBot/pkg/utils"
+
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sashabaranov/go-openai"
-	"log"
-	"strings"
 )
 
-func GetResponse(update tg.Update, user *models.User, model string) ([]tg.Chattable, error) {
+var ImageSupportedModels = []string{
+	openai.GPT4oMini,
+	openai.GPT4o,
+}
+
+func GetResponse(bot *tg.BotAPI, update tg.Update, user *models.User, model string) ([]tg.Chattable, error) {
 	if utils.GetEnvVar("GPT_API_KEY") == "" {
 		return nil, errors.New(consts.ErrorMissingGptKey)
 	}
@@ -27,14 +37,91 @@ func GetResponse(update tg.Update, user *models.User, model string) ([]tg.Chatta
 		return nil, sendMsgErr
 	}
 
-	request := createRequest(user, update, model)
+	if update.Message.Photo != nil && isImageSupportedModel(model) {
+		return handleImageMessage(bot, update, user, client, model)
+	} else {
+		return handleTextMessage(update, user, client, model)
+	}
+}
 
-	resp, err := getResponseFromGPT(client, request)
+func isImageSupportedModel(model string) bool {
+	for _, m := range ImageSupportedModels {
+		if model == m {
+			return true
+		}
+	}
+	return false
+}
+
+func handleImageMessage(bot *tg.BotAPI, update tg.Update, user *models.User, client *openai.Client, model string) ([]tg.Chattable, error) {
+	photo := update.Message.Photo
+	fileID := photo[len(photo)-1].FileID
+	file, err := bot.GetFile(tg.FileConfig{FileID: fileID})
+	if err != nil {
+		return nil, fmt.Errorf("error getting file: %w", err)
+	}
+
+	fileURL := file.Link(bot.Token)
+	resp, err := http.Get(fileURL)
+	if err != nil {
+		return nil, fmt.Errorf("error downloading file: %w", err)
+	}
+	defer resp.Body.Close()
+
+	imageData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading image data: %w", err)
+	}
+
+	imgBase64 := base64.StdEncoding.EncodeToString(imageData)
+
+	imageDataURL := fmt.Sprintf("data:image/jpeg;base64,%s", imgBase64)
+
+	var multiContent []openai.ChatMessagePart
+
+	if update.Message.Caption != "" {
+		multiContent = append(multiContent, openai.ChatMessagePart{
+			Type: openai.ChatMessagePartTypeText,
+			Text: update.Message.Caption,
+		})
+	}
+
+	multiContent = append(multiContent, openai.ChatMessagePart{
+		Type: openai.ChatMessagePartTypeImageURL,
+		ImageURL: &openai.ChatMessageImageURL{
+			URL:    imageDataURL,
+			Detail: openai.ImageURLDetailLow,
+		},
+	})
+
+	request := openai.ChatCompletionRequest{
+		Model:     model,
+		MaxTokens: 1000,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:         openai.ChatMessageRoleUser,
+				MultiContent: multiContent,
+			},
+		},
+	}
+
+	res, err := client.CreateChatCompletion(context.Background(), request)
 	if err != nil {
 		return nil, fmt.Errorf("error getting response from GPT: %w", err)
 	}
 
-	return handleGptResponse(update, user, resp)
+	return handleGptResponse(update, user, res)
+}
+
+func handleTextMessage(update tg.Update, user *models.User, client *openai.Client, model string) ([]tg.Chattable, error) {
+	request := createRequest(user, update, model)
+
+	res, err := getResponseFromGPT(client, request)
+	if err != nil {
+		return nil, fmt.Errorf("error getting response from GPT: %w", err)
+	}
+
+	return handleGptResponse(update, user, res)
 }
 
 func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
@@ -46,7 +133,21 @@ func getResponseFromGPT(client *openai.Client, req openai.ChatCompletionRequest)
 }
 
 func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompletionResponse) ([]tg.Chattable, error) {
-	err := messageService.CreateMessage(user.Id, update.Message.Text, res.Choices[0].Message.Content, user.Mode)
+	var responseContent string
+	if len(res.Choices) > 0 {
+		responseContent = res.Choices[0].Message.Content
+	} else {
+		return nil, errors.New("no response from GPT")
+	}
+
+	var inputMessage string
+	if update.Message.Caption != "" {
+		inputMessage = update.Message.Caption
+	} else {
+		inputMessage = update.Message.Text
+	}
+
+	err := messageService.CreateMessage(user.Id, inputMessage, responseContent, user.Mode)
 	if err != nil {
 		return nil, fmt.Errorf("error creating message: %w", err)
 	}
@@ -61,7 +162,7 @@ func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompl
 		return nil, fmt.Errorf("error saving usage: %w", err)
 	}
 
-	text := res.Choices[0].Message.Content
+	text := responseContent
 	parts := splitMessage(text, 4095)
 
 	var messages []tg.Chattable
