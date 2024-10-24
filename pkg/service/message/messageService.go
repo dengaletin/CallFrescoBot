@@ -23,14 +23,6 @@ func ParseUpdate(update tg.Update) (*tg.Message, *tg.User, error) {
 }
 
 func ValidateMessage(cmd string) (string, error) {
-	// todo: remove?
-	//if cmd == "" {
-	//	return utils.LocalizeSafe(consts.UnsupportedMessageType), errors.New("unsupported message type")
-	//}
-	//if len([]rune(cmd)) < 4 {
-	//	return utils.LocalizeSafe(consts.MessageIsTooShort), errors.New("message is too short")
-	//}
-
 	return cmd, nil
 }
 

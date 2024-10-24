@@ -24,16 +24,18 @@ func InvoiceCreate(
 	coin int,
 	planId *uint64,
 	status int64,
+	telegramPaymentChargeID string,
 	db *gorm.DB,
 ) (*models.Invoice, error) {
 	newInvoice := models.Invoice{
-		PaymentMethodId: paymentMethodId,
-		UserId:          userId,
-		Amount:          amount,
-		Currency:        currency,
-		Coin:            coin,
-		PlanId:          planId,
-		Status:          status,
+		PaymentMethodId:       paymentMethodId,
+		UserId:                userId,
+		Amount:                amount,
+		Currency:              currency,
+		Coin:                  coin,
+		PlanId:                planId,
+		TelegramTransactionID: telegramPaymentChargeID,
+		Status:                status,
 	}
 	result := db.Create(&newInvoice)
 

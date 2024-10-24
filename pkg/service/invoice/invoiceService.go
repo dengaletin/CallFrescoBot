@@ -95,6 +95,7 @@ func CreateInvoiceUrl(plan *models.Plan, user *models.User) (string, error) {
 		0,
 		&planId,
 		0,
+		"",
 		db,
 	)
 

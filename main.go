@@ -4,9 +4,12 @@ import (
 	"CallFrescoBot/app"
 	"CallFrescoBot/pkg/commands"
 	"CallFrescoBot/pkg/consts"
+	invoiceRepository "CallFrescoBot/pkg/repositories/invoice"
 	callbackService "CallFrescoBot/pkg/service/callback"
 	messageService "CallFrescoBot/pkg/service/message"
 	"CallFrescoBot/pkg/service/numericKeyboard"
+	planService "CallFrescoBot/pkg/service/plan"
+	subsciptionService "CallFrescoBot/pkg/service/subsciption"
 	userService "CallFrescoBot/pkg/service/user"
 	"CallFrescoBot/pkg/utils"
 	"fmt"
@@ -32,7 +35,7 @@ func processUpdates(updates tg.UpdatesChannel) {
 	bot := utils.GetBot()
 
 	for update := range updates {
-		if update.Message == nil && update.CallbackQuery == nil {
+		if update.Message == nil && update.CallbackQuery == nil && update.PreCheckoutQuery == nil {
 			continue
 		}
 
@@ -71,11 +74,83 @@ func handleUpdate(update tg.Update, bot *tg.BotAPI) error {
 		return fmt.Errorf("process callback error: %w", callbackErr)
 	}
 
+	preCheckoutErr := processPreCheckout(update, bot)
+	if preCheckoutErr != nil {
+		return fmt.Errorf("process preCheckout error: %w", callbackErr)
+	}
+
+	successfulPaymentErr := handleSuccessfulPayment(update, bot)
+	if successfulPaymentErr != nil {
+		return fmt.Errorf("handle successful payment error: %w", successfulPaymentErr)
+	}
+
 	return nil
+}
+
+func handleSuccessfulPayment(update tg.Update, bot *tg.BotAPI) error {
+	if update.Message == nil || update.Message.SuccessfulPayment == nil {
+		return nil
+	}
+
+	db, _ := utils.GetDatabaseConnection()
+
+	successfulPayment := update.Message.SuccessfulPayment
+	log.Printf("Received SuccessfulPayment: %v", successfulPayment)
+
+	payload := successfulPayment.InvoicePayload
+	planID, err := extractPlanID(payload)
+	if err != nil {
+		log.Printf("Invalid payload in SuccessfulPayment: %v", err)
+		return err
+	}
+
+	user, err := userService.GerUserByTgId(update.Message.From.ID)
+
+	plan, err := planService.GetPlanById(planID)
+	if err != nil {
+		log.Printf("Failed to get plan by id: %v", err)
+	}
+	planId := plan.Id
+
+	_, err = subsciptionService.CreateWithPlan(user, plan)
+
+	_, _ = invoiceRepository.InvoiceCreate(
+		1,
+		user.Id,
+		float64(update.Message.SuccessfulPayment.TotalAmount),
+		update.Message.SuccessfulPayment.Currency,
+		0,
+		&planId,
+		1,
+		successfulPayment.TelegramPaymentChargeID,
+		db,
+	)
+
+	confirmation := tg.NewMessage(update.Message.From.ID, utils.LocalizeSafe(consts.SubscriptionSuccess))
+	_, err = bot.Send(confirmation)
+	if err != nil {
+		log.Printf("Failed to send confirmation message: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func extractPlanID(payload string) (uint64, error) {
+	var planID uint64
+	n, err := fmt.Sscanf(payload, "plan_%d", &planID)
+	if err != nil || n != 1 {
+		return 0, fmt.Errorf("invalid payload format")
+	}
+	return planID, nil
 }
 
 func processMessage(update tg.Update, bot *tg.BotAPI, messageInfo string) error {
 	if update.Message == nil {
+		return nil
+	}
+
+	if update.Message.SuccessfulPayment != nil {
 		return nil
 	}
 
@@ -136,6 +211,31 @@ func processCallback(update tg.Update, bot *tg.BotAPI, messageInfo string) error
 	return nil
 }
 
+func processPreCheckout(update tg.Update, bot *tg.BotAPI) error {
+	if update.PreCheckoutQuery == nil {
+		return nil
+	}
+
+	preCheckout := update.PreCheckoutQuery
+
+	log.Printf("Received PreCheckoutQuery with payload: %s", preCheckout.InvoicePayload)
+
+	answer := tg.PreCheckoutConfig{
+		PreCheckoutQueryID: preCheckout.ID,
+		OK:                 true,
+		ErrorMessage:       "",
+	}
+
+	_, err := bot.Request(answer)
+	if err != nil {
+		log.Printf("Failed to answer PreCheckoutQuery: %v", err)
+		return fmt.Errorf("answer pre_checkout_query error: %w", err)
+	}
+
+	log.Println("PreCheckoutQuery answered successfully with ok=true")
+	return nil
+}
+
 func formatMessageInfo(message *tg.Message) string {
 	return fmt.Sprintf(
 		"[%s, %d] %s",
@@ -155,13 +255,4 @@ func logAndNotifyOnErr(messageInfo string, err error) error {
 		}
 	}
 	return nil
-}
-
-func sendBotResponse(bot *tg.BotAPI, response tg.Chattable) error {
-	if response == nil {
-		return nil
-	}
-	_, err := bot.Send(response)
-
-	return err
 }
