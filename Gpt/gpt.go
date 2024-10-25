@@ -157,6 +157,10 @@ func handleGptResponse(update tg.Update, user *models.User, res openai.ChatCompl
 		userMode = userMode + 100
 	}
 
+	if update.Message.Voice != nil {
+		userMode = userMode + 1000
+	}
+
 	err = usageService.SaveUsage(user, userMode)
 	if err != nil {
 		return nil, fmt.Errorf("error saving usage: %w", err)

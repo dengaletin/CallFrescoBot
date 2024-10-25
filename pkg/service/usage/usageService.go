@@ -38,6 +38,22 @@ func SaveUsage(user *models.User, modeId int64) error {
 		usage.Gpt4OContext += 1
 	case consts.UsageModeGpt4O1Context:
 		usage.Gpt4O1Context += 1
+	case consts.UsageModeGpt4OMiniVoice:
+		usage.Gpt4OMiniVoice += 1
+	case consts.UsageModeDalle3Voice:
+		usage.Dalle3Voice += 1
+	case consts.UsageModeGpt4OVoice:
+		usage.Gpt4OVoice += 1
+	case consts.UsageModeGpt4O1Voice:
+		usage.Gpt4O1Voice += 1
+	case consts.UsageModeGpt4OMiniContextVoice:
+		usage.Gpt4OMiniContextVoice += 1
+	case consts.UsageModeDalle3ContextVoice:
+		usage.Dalle3ContextVoice += 1
+	case consts.UsageModeGpt4OContextVoice:
+		usage.Gpt4OContextVoice += 1
+	case consts.UsageModeGpt4O1ContextVoice:
+		usage.Gpt4O1ContextVoice += 1
 	default:
 		return fmt.Errorf("unknown usage mode: %w", err)
 	}

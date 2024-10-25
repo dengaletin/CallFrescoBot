@@ -55,25 +55,25 @@ func (cmd StatusCommand) RunCommand() ([]tg.Chattable, error) {
 		if config.Limit.Gpt4OMiniLimit > 0 {
 			limitsInfo += fmt.Sprintf(
 				"*GPT4o-mini* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
-				usage.Gpt4OMini+usage.Gpt4OMiniContext, config.Limit.Gpt4OMiniLimit,
+				usage.Gpt4OMini+usage.Gpt4OMiniContext+usage.Gpt4OMiniVoice+usage.Gpt4OMiniContextVoice, config.Limit.Gpt4OMiniLimit,
 			)
 		}
 		if config.Limit.Gpt4OLimit > 0 {
 			limitsInfo += fmt.Sprintf(
 				"*GPT4o* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
-				usage.Gpt4O+usage.Gpt4OContext, config.Limit.Gpt4OLimit,
+				usage.Gpt4O+usage.Gpt4OContext+usage.Gpt4OVoice+usage.Gpt4OContextVoice, config.Limit.Gpt4OLimit,
 			)
 		}
 		if config.Limit.Dalle3Limit > 0 {
 			limitsInfo += fmt.Sprintf(
 				"*Dalle3* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
-				usage.Dalle3+usage.Dalle3Context, config.Limit.Dalle3Limit,
+				usage.Dalle3+usage.Dalle3Context+usage.Dalle3Voice+usage.Dalle3ContextVoice, config.Limit.Dalle3Limit,
 			)
 		}
 		if config.Limit.Gpt4O1Limit > 0 {
 			limitsInfo += fmt.Sprintf(
 				"*GPT4o1* - %d / %d "+utils.LocalizeSafe(consts.Requests)+"\n",
-				usage.Gpt4O1+usage.Gpt4O1Context, config.Limit.Gpt4O1Limit,
+				usage.Gpt4O1+usage.Gpt4O1Context+usage.Gpt4O1Voice+usage.Gpt4O1ContextVoice, config.Limit.Gpt4O1Limit,
 			)
 		}
 		contextSupport := utils.LocalizeSafe(consts.No)

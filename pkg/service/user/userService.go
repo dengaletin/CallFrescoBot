@@ -92,25 +92,25 @@ func ValidateUser(user *models.User) (string, error) {
 			if config.Limit.Gpt4OMiniLimit <= 0 {
 				return "Model is not available in your subscription", errors.New("GPT-4o-mini model is not available in your subscription")
 			}
-			usageCount = usage.Gpt4OMini + usage.Gpt4OMiniContext
+			usageCount = usage.Gpt4OMini + usage.Gpt4OMiniContext + usage.Gpt4OMiniVoice + usage.Gpt4OMiniContextVoice
 			currentLimit = config.Limit.Gpt4OMiniLimit
 		case consts.UsageModeDalle3:
 			if config.Limit.Dalle3Limit <= 0 {
 				return "Model is not available in your subscription", errors.New("DALL-E-3 model is not available in your subscription")
 			}
-			usageCount = usage.Dalle3 + usage.Dalle3Context
+			usageCount = usage.Dalle3 + usage.Dalle3Context + usage.Dalle3Voice + usage.Dalle3ContextVoice
 			currentLimit = config.Limit.Dalle3Limit
 		case consts.UsageModeGpt4O:
 			if config.Limit.Gpt4OLimit <= 0 {
 				return "Model is not available in your subscription", errors.New("GPT-4-o model is not available in your subscription")
 			}
-			usageCount = usage.Gpt4O + usage.Gpt4OContext
+			usageCount = usage.Gpt4O + usage.Gpt4OContext + usage.Gpt4OVoice + usage.Gpt4OContextVoice
 			currentLimit = config.Limit.Gpt4OLimit
 		case consts.UsageModeGpt4O1:
 			if config.Limit.Gpt4O1Limit <= 0 {
 				return "Model is not available in your subscription", errors.New("GPT-4-o1 model is not available in your subscription")
 			}
-			usageCount = usage.Gpt4O1 + usage.Gpt4O1Context
+			usageCount = usage.Gpt4O1 + usage.Gpt4O1Context + usage.Gpt4O1Voice + usage.Gpt4O1ContextVoice
 			currentLimit = config.Limit.Gpt4O1Limit
 		default:
 			return "", fmt.Errorf("unknown usage mode: %w", err)
