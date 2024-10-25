@@ -2,7 +2,6 @@ package commands
 
 import (
 	"CallFrescoBot/pkg/consts"
-	"CallFrescoBot/pkg/service/numericKeyboard"
 	"CallFrescoBot/pkg/utils"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -17,10 +16,7 @@ func (cmd StartCommand) RunCommand() ([]tg.Chattable, error) {
 		return []tg.Chattable{tg.NewMessage(cmd.Update.Message.Chat.ID, result)}, err
 	}
 
-	nk, err := numericKeyboard.CreateNumericKeyboard("main", cmd.User, "main")
-
 	msg := tg.NewMessage(cmd.Update.Message.Chat.ID, utils.LocalizeSafe(consts.StartMsg))
-	msg.ReplyMarkup = nk
 	msg.ParseMode = "markdown"
 
 	return []tg.Chattable{msg}, nil

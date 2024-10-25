@@ -1,7 +1,7 @@
 [
   {
     "id": "StartMsg",
-    "translation": "Fresco AI is ready to go! Choose a mode and forge ahead!\n\n\uD83D\uDCF2 ChatGPT Mode works with textual information. Ask Fresco anything from birthday greetings for your favorite aunt to a scientific research request.\n\n\uD83C\uDFA8 DALL-E 3 Mode will create any image, as long as it doesn't violate its rules. Describe to Fresco everything you want to see and enjoy the result.\n\n\uD83D\uDCAC Dialogue (Context) Mode helps enhance your query. When activated, Fresco considers your previous response and supplements it with a new command.\n\nIn the free version, you have 5 requests per day. Need more? Take advantage of one of the offered tariff plans (command /buy).\n\nReady? Let's go!"
+    "translation": "Fresco is ready to work! \uD83D\uDE80 What can I do?\n\n– I will answer any of your questions and support the dialogue \uD83D\uDCAC\n\n– I will find information faster than any search engine \uD83D\uDD0D\n\n– I will write text for social media or SEO on any topic \uD83D\uDCDD\n\n– I work without VPN and channel subscriptions \uD83D\uDD13\n\n– Free – 5 requests per day \uD83D\uDC9D\n\nThe cost of the subscription with a large number of requests is 300 ⭐. Pay without leaving Telegram and enjoy! \uD83D\uDCF2\uD83D\uDE0A\n\nBuy a subscription - /buy  \nBot settings - /options\n\nSo, shall we start? \uD83C\uDF89"
   },
   {
     "id": "FirstRunMsg",
